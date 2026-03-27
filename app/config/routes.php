@@ -16,6 +16,7 @@ $UserController = new UserController($userModel);
 $router->get('/', [$UserController, 'logPageAdmin']);
 $router->get('/loginAdmin', [$UserController, 'logPageAdmin']);
 $router->post('/login_admin', [$UserController, 'loginUser']);
+$router->get('/pageAdmin', [$UserController, 'pageAdmin']);
 
 
 

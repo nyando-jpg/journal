@@ -138,8 +138,12 @@ docker-compose up -d
 ### **Vérifier l'état:**
 ```powershell
 docker-compose ps
-```
 
+```
+### **nouvelle base**
+```powershell
+docker-compose down -v
+docker-compose up
 ---
 
 ## 🌐 URLS IMPORTANTES
