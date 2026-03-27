@@ -1,4 +1,4 @@
-FROM php:8-apache
+FROM php:8.4-apache
 
 # Activer les modules Apache nécessaires
 RUN a2enmod rewrite && \
