@@ -1,0 +1,53 @@
+# ========== DOCKER ==========
+docker-compose.override.yml
+.dockerignore
+
+# ========== DATABASE ==========
+mysql_data/
+*.sql.backup
+
+# ========== PHP ==========
+vendor/
+composer.lock
+
+# ========== LOGS & CACHE ==========
+app/log/*
+app/cache/*
+*.log
+
+# ========== OS FILES ==========
+.DS_Store
+Thumbs.db
+desktop.ini
+.Spotlight-V100
+.Trashes
+
+# ========== IDE & EDITORS ==========
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.sublime-project
+.sublime-workspace
+
+# ========== ENVIRONMENT & CONFIG ==========
+.env
+.env.local
+.env.*.local
+config_sample.php
+
+# ========== UPLOADS & TEMP ==========
+uploads/*
+!uploads/.gitkeep
+tmp/
+temp/
+
+# ========== LOCAL TESTING ==========
+.phpunit.result.cache
+coverage/
+
+# ========== NPM (si vous utilisez Node.js) ==========
+node_modules/
+npm-debug.log
+yarn-error.log

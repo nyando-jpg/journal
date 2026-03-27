@@ -1,0 +1,36 @@
+services:
+    mysql:
+        image: mysql:8.0
+        container_name: site_app_mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: gestion_the
+        ports:
+            - "3306:3306"
+        volumes:
+            - mysql_data:/var/lib/mysql
+            - ./sql/script.sql:/docker-entrypoint-initdb.d/init.sql
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+            timeout: 5s
+            retries: 10
+
+    flight:
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile.php
+        container_name: site_app_php
+        working_dir: /var/www
+        environment:
+            docker: "true"
+        ports:
+            - "8000:80"
+        volumes:
+            - .:/var/www
+            - ./docker/apache.conf:/etc/apache2/sites-available/000-default.conf
+        depends_on:
+            mysql:
+                condition: service_healthy
+
+volumes:
+    mysql_data:
