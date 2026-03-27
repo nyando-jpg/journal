@@ -10,3 +10,8 @@ CREATE TABLE journal_user (
     mail VARCHAR(100) NOT NULL UNIQUE,
     is_admin BOOLEAN NOT NULL DEFAULT FALSE
 );
+CREATE TABLE journal_info (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    date DATE NOT NULL,
+    details TEXT NOT NULL
+);
