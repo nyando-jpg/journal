@@ -35,7 +35,8 @@ desktop.ini
 .env
 .env.local
 .env.*.local
-config_sample.php
+config.php
+!config_sample.php
 
 # ========== UPLOADS & TEMP ==========
 uploads/*
