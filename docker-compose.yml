@@ -6,11 +6,10 @@ services:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: gestion_the
         ports:
-            - "3306:3306"
+            - "3307:3306"
         volumes:
             - mysql_data:/var/lib/mysql
             - ./sql/script.sql:/docker-entrypoint-initdb.d/1-script.sql
-            - ./sql/data.sql:/docker-entrypoint-initdb.d/2-data.sql
         healthcheck:
             test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
             timeout: 5s
@@ -29,9 +28,11 @@ services:
         volumes:
             - .:/var/www
             - ./docker/apache.conf:/etc/apache2/sites-available/000-default.conf
+            - vendor_data:/var/www/vendor
         depends_on:
             mysql:
                 condition: service_healthy
 
 volumes:
     mysql_data:
+    vendor_data:
