@@ -13,6 +13,7 @@
         
         <nav>
             <ul>
+                <li><a href="/admin/articles">Gérer les Articles</a></li>
                 <li><a href="/">Accueil</a></li>
             </ul>
         </nav>
