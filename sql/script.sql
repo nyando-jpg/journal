@@ -1,6 +1,5 @@
--- Création de la base de données
-CREATE DATABASE IF NOT EXISTS gestion_journal;
-USE gestion_journal;
+-- Utiliser la base de données créée par Docker
+USE gestion_the;
 
 -- Table des utilisateurs et administrateurs
 CREATE TABLE journal_user (
