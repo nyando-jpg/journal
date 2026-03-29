@@ -146,7 +146,7 @@
 
                 input.click();
             },
-            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 16px; }'
+            content_style: 'body { font-family: "Merriweather", Georgia, serif; font-size: 16px; }'
         });
     </script>
 </body>

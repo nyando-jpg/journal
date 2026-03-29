@@ -60,7 +60,7 @@
             box-sizing: border-box;
         }
         body {
-            font-family: 'Georgia', serif;
+            font-family: "Merriweather", Georgia, serif;
             line-height: 1.8;
             color: #333;
             background-color: #f5f5f5;
@@ -97,9 +97,10 @@
             text-decoration: underline;
         }
         main {
-            max-width: 800px;
+            width: 90%;
+            max-width: 1200px;
             margin: 40px auto;
-            padding: 0 20px;
+            padding: 0;
         }
         .article-container {
             background: white;
@@ -115,6 +116,58 @@
         }
         .article-content {
             font-size: 1.1rem;
+        }
+        .article-content p:first-of-type {
+            letter-spacing: 0.01em;
+        }
+        .article-content p:first-of-type::first-letter {
+            float: left;
+            font-family: "Playfair Display", "Times New Roman", serif;
+            font-size: 4.4em;
+            line-height: 0.82;
+            margin: 0.03em 0.14em 0 0;
+            font-weight: 700;
+            color: #0f172a;
+            text-transform: uppercase;
+        }
+        .article-content .image-sequence {
+            display: grid;
+            gap: 12px;
+            margin: 18px 0;
+            align-items: start;
+            justify-items: center;
+        }
+        .article-content * + .image-sequence {
+            margin-top: 24px;
+        }
+        .article-content .image-sequence + * {
+            margin-top: 18px;
+        }
+        .article-content .image-sequence > * {
+            margin: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .article-content .image-sequence img {
+            width: auto;
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            display: block;
+        }
+        .article-content .image-sequence.image-count-1 {
+            grid-template-columns: minmax(280px, 65%);
+            justify-content: center;
+        }
+        .article-content .image-sequence.image-count-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .article-content .image-sequence.image-count-3 {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .article-content .image-sequence.image-count-many {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
         .article-content h1 {
             font-size: 2rem;
@@ -164,12 +217,73 @@
         .back-link:hover {
             background-color: #d63850;
         }
+        .related-section {
+            margin-top: 30px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 20px;
+        }
+        .related-title {
+            margin: 0 0 14px 0;
+            font-size: 1.1rem;
+            color: #1a1a2e;
+        }
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+        .related-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #fff;
+            text-decoration: none;
+            color: inherit;
+        }
+        .related-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+        .related-thumb {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            display: block;
+            background: #f3f4f6;
+        }
+        .related-body {
+            padding: 10px;
+        }
+        .related-date {
+            margin: 0 0 6px 0;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+        .related-name {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #111827;
+            line-height: 1.4;
+        }
         footer {
             background-color: #1a1a2e;
             color: white;
             text-align: center;
             padding: 30px;
             margin-top: 50px;
+        }
+        @media (max-width: 900px) {
+            .article-content p:first-of-type::first-letter {
+                font-size: 3.4em;
+                margin-right: 0.12em;
+            }
+            .article-content .image-sequence.image-count-2,
+            .article-content .image-sequence.image-count-3,
+            .article-content .image-sequence.image-count-many {
+                grid-template-columns: 1fr;
+            }
+            .related-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -192,14 +306,25 @@
             </div>
 
             <div class="article-content" itemprop="articleBody">
-                <?= preg_replace_callback('/src="([^"]+)"/i', function($m) {
-                    $src = $m[1];
-                    if (strpos($src, '../../uploads/') === 0) {
-                        return 'src="' . str_replace('../../uploads/', '/uploads/', $src) . '"';
-                    }
-                    return $m[0];
-                }, $article['details']) ?>
+                <?= $articleDetailsHtml ?? '' ?>
             </div>
+
+            <?php if (!empty($relatedArticles)): ?>
+                <div class="related-section">
+                    <h3 class="related-title">Les lecteurs lisent aussi</h3>
+                    <div class="related-grid">
+                        <?php foreach ($relatedArticles as $related): ?>
+                            <a href="/article/<?= (int) $related['id'] ?>" class="related-card">
+                                <img src="<?= htmlspecialchars((string) $related['first_image']) ?>" alt="Apercu article" class="related-thumb">
+                                <div class="related-body">
+                                    <p class="related-date"><?= htmlspecialchars((string) ($related['date'] ?? '')) ?></p>
+                                    <p class="related-name"><?= htmlspecialchars((string) ($related['titre'] ?? '')) ?></p>
+                                </div>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <a href="/actualites" class="back-link">&larr; Retour aux actualités</a>
         </article>
