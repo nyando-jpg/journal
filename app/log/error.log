@@ -56,3 +56,6 @@
 [2026-03-29 15-26-58] PHP Warning: preg_match(): Unknown modifier ']' in /var/www/app/controllers/ArticleController.php:271  @  http://localhost:8000/admin/articles/store 
 [2026-03-29 15-26-58] PHP Warning: preg_match(): Unknown modifier ']' in /var/www/app/controllers/ArticleController.php:272  @  http://localhost:8000/admin/articles/store 
 [2026-03-29 15-26-58] PHP Warning: preg_match(): Unknown modifier ']' in /var/www/app/controllers/ArticleController.php:273  @  http://localhost:8000/admin/articles/store 
+[2026-03-29 17-58-23] PHP Warning: preg_match(): Unknown modifier ']' in /var/www/app/controllers/ArticleController.php:274  @  http://localhost:8000/admin/articles/store 
+[2026-03-29 17-58-23] PHP Warning: preg_match(): Unknown modifier ']' in /var/www/app/controllers/ArticleController.php:275  @  http://localhost:8000/admin/articles/store 
+[2026-03-29 17-58-23] PHP Warning: preg_match(): Unknown modifier ']' in /var/www/app/controllers/ArticleController.php:276  @  http://localhost:8000/admin/articles/store 
