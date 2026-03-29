@@ -38,37 +38,96 @@
             color: #333;
             background-color: #f5f5f5;
         }
-        header {
-            background-color: #1a1a2e;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
+        .site-header {
+            background-color: #0f172a;
+            color: #f8fafc;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.35);
         }
-        header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+        .header-top {
+            background: #0b1220;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+            font-size: 0.86rem;
         }
-        header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
+        .header-top-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            color: #cbd5e1;
         }
-        nav.main-nav {
-            background-color: #16213e;
-            padding: 15px 0;
-            text-align: center;
+        .header-main-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
         }
-        nav.main-nav a {
-            color: white;
+        .brand-link {
+            color: #ffffff;
             text-decoration: none;
-            margin: 0 20px;
-            font-size: 1rem;
+            font-size: 2rem;
+            line-height: 1.1;
+            font-family: "Playfair Display", "Times New Roman", serif;
         }
-        nav.main-nav a:hover {
-            text-decoration: underline;
+        .brand-tagline {
+            margin: 4px 0 0;
+            font-size: 0.95rem;
+            color: #cbd5e1;
         }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .header-chip {
+            border: 1px solid rgba(148, 163, 184, 0.55);
+            color: #e2e8f0;
+            text-decoration: none;
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 0.88rem;
+        }
+        .header-categories {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            padding-top: 12px;
+            border-top: 1px solid rgba(148, 163, 184, 0.25);
+        }
+        .category-link {
+            display: inline-block;
+            padding: 0;
+            background: none;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        .category-link:hover {
+            background: none;
+            color: #60a5fa;
+            border-color: transparent;
+        }
+        .category-link.active {
+            background: none;
+            color: #60a5fa;
+            border-color: transparent;
+            font-weight: 600;
+        }
+
         main {
             max-width: 1200px;
-            margin: 40px auto;
+            margin: 20px auto;
             padding: 0 20px;
         }
         .search-bar {
@@ -229,11 +288,58 @@
             border-radius: 8px;
         }
         footer {
-            background-color: #1a1a2e;
-            color: white;
-            text-align: center;
-            padding: 30px;
+            background-color: #121629;
+            color: #e5e7eb;
+            padding: 38px 20px 20px;
             margin-top: 50px;
+        }
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr;
+            gap: 24px;
+        }
+        .footer-title {
+            margin: 0 0 10px 0;
+            font-size: 1rem;
+            color: #ffffff;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .footer-text {
+            margin: 0;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .footer-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 7px;
+        }
+        .footer-list a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+        .footer-list a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 18px auto 0;
+            padding-top: 16px;
+            border-top: 1px solid rgba(148, 163, 184, 0.35);
+            color: #94a3b8;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         @media (max-width: 1100px) {
             .articles-layout {
@@ -242,30 +348,59 @@
             .articles-without-image {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
+            .footer-inner {
+                grid-template-columns: 1fr 1fr;
+            }
         }
         @media (max-width: 760px) {
             .articles-with-image,
             .articles-without-image {
                 grid-template-columns: 1fr;
             }
+            .footer-inner {
+                grid-template-columns: 1fr;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Journal d'Information</h1>
-        <p>Actualités sur la situation en Iran</p>
-    </header>
+    <header class="site-header">
+        <div class="header-top">
+            <div class="header-top-inner">
+                <span>Edition du <?= date('d/m/Y') ?> - Mise a jour continue</span>
+                <span>Contact redaction: redaction@journalinfo.fr</span>
+            </div>
+        </div>
 
-    <nav class="main-nav" role="navigation" aria-label="Navigation principale">
-        <a href="/actualites">Accueil</a>
-        <a href="/loginAdmin">Administration</a>
-    </nav>
+        <div class="header-main-inner">
+            <div>
+                <a href="/actualites" class="brand-link">Journal d'Information</a>
+                <p class="brand-tagline">Analyses, terrain et decryptage geopolitique</p>
+            </div>
+
+            <div class="header-categories">
+                <?php foreach (($categories ?? []) as $headerCategory): ?>
+                    <a
+                        href="/actualites?category=<?= (int) $headerCategory['id_categorie'] ?>"
+                        class="category-link <?= (int) ($selectedCategoryId ?? 0) === (int) $headerCategory['id_categorie'] ? 'active' : '' ?>"
+                    >
+                        <?= htmlspecialchars((string) $headerCategory['nom_categorie']) ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </header>
 
     <main>
         <section aria-label="Liste des articles">
-            <h2 style="margin-bottom: 30px; font-size: 1.8rem;">Dernières Actualités</h2>
-
+           <br><br>
+            <br>
+            <br>
+            <br><br>
             <form action="/actualites" method="GET" class="search-bar">
                 <input
                     type="text"
@@ -460,7 +595,34 @@
     </main>
 
     <footer>
-        <p>&copy; <?= date('Y') ?> Journal d'Information - Tous droits réservés</p>
+        <div class="footer-inner">
+            <section>
+                <h4 class="footer-title">Journal d'Information</h4>
+                <p class="footer-text">Couverture continue des actualites, analyses de contexte et suivi terrain. Notre redaction publie des mises a jour quotidiennes avec verification des sources.</p>
+            </section>
+
+            <section>
+                <h4 class="footer-title">Rubriques</h4>
+                <ul class="footer-list">
+                    <li><a href="/actualites">A la une</a></li>
+                    <li><a href="/actualites">Geopolitique</a></li>
+                    <li><a href="/actualites">Conflits et terrain</a></li>
+                    <li><a href="/actualites">Analyses</a></li>
+                </ul>
+            </section>
+
+            <section>
+                <h4 class="footer-title">Contact Redaction</h4>
+                <p class="footer-text">Email: redaction@journalinfo.fr</p>
+                <p class="footer-text">Tel: +261 34 00 000 00</p>
+                <p class="footer-text">Lun-Ven: 08h00 - 18h00</p>
+            </section>
+        </div>
+
+        <div class="footer-bottom">
+            <span>&copy; <?= date('Y') ?> Journal d'Information. Tous droits reserves.</span>
+            <span>Mentions legales | Politique de confidentialite</span>
+        </div>
     </footer>
 </body>
 </html>

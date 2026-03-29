@@ -65,41 +65,97 @@
             color: #333;
             background-color: #f5f5f5;
         }
-        header {
-            background-color: #1a1a2e;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
+        .site-header {
+            background-color: #0f172a;
+            color: #f8fafc;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.35);
         }
-        header h1 {
+        .header-top {
+            background: #0b1220;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+            font-size: 0.86rem;
+        }
+        .header-top-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            color: #cbd5e1;
+        }
+        .header-main-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .brand-link {
+            color: #ffffff;
+            text-decoration: none;
             font-size: 2rem;
-            margin-bottom: 5px;
+            line-height: 1.1;
+            font-family: "Playfair Display", "Times New Roman", serif;
         }
-        header a {
-            color: white;
+        .brand-tagline {
+            margin: 4px 0 0;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .header-chip {
+            border: 1px solid rgba(148, 163, 184, 0.55);
+            color: #e2e8f0;
             text-decoration: none;
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 0.88rem;
         }
-        header a:hover {
-            text-decoration: underline;
+        .header-categories {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            padding-top: 12px;
+            border-top: 1px solid rgba(148, 163, 184, 0.25);
         }
-        nav.main-nav {
-            background-color: #16213e;
-            padding: 15px 0;
-            text-align: center;
-        }
-        nav.main-nav a {
-            color: white;
+        .category-link {
+            display: inline-block;
+            padding: 0;
+            background: none;
+            color: #ffffff;
             text-decoration: none;
-            margin: 0 20px;
-            font-size: 1rem;
+            border-radius: 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            transition: all 0.2s ease;
         }
-        nav.main-nav a:hover {
-            text-decoration: underline;
+        .category-link:hover {
+            background: none;
+            color: #60a5fa;
+            border-color: transparent;
         }
+        .category-link.active {
+            background: none;
+            color: #60a5fa;
+            border-color: transparent;
+            font-weight: 600;
+        }
+
         main {
             width: 90%;
             max-width: 1200px;
-            margin: 40px auto;
+            margin: 20px auto;
             padding: 0;
         }
         .article-container {
@@ -265,11 +321,58 @@
             line-height: 1.4;
         }
         footer {
-            background-color: #1a1a2e;
-            color: white;
-            text-align: center;
-            padding: 30px;
+            background-color: #121629;
+            color: #e5e7eb;
+            padding: 38px 20px 20px;
             margin-top: 50px;
+        }
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr;
+            gap: 24px;
+        }
+        .footer-title {
+            margin: 0 0 10px 0;
+            font-size: 1rem;
+            color: #ffffff;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .footer-text {
+            margin: 0;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .footer-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 7px;
+        }
+        .footer-list a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+        .footer-list a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 18px auto 0;
+            padding-top: 16px;
+            border-top: 1px solid rgba(148, 163, 184, 0.35);
+            color: #94a3b8;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         @media (max-width: 900px) {
             .article-content p:first-of-type::first-letter {
@@ -284,18 +387,46 @@
             .related-grid {
                 grid-template-columns: 1fr;
             }
+            .footer-inner {
+                grid-template-columns: 1fr;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1><a href="/actualites">Journal d'Information</a></h1>
-    </header>
+    <header class="site-header">
+        <div class="header-top">
+            <div class="header-top-inner">
+                <span>Edition du <?= date('d/m/Y') ?> - Mise a jour continue</span>
+                <span>Contact redaction: redaction@journalinfo.fr</span>
+            </div>
+        </div>
 
-    <nav class="main-nav" role="navigation" aria-label="Navigation principale">
-        <a href="/actualites">Accueil</a>
-        <a href="/loginAdmin">Administration</a>
-    </nav>
+        <div class="header-main-inner">
+            <div>
+                <a href="/actualites" class="brand-link">Journal d'Information</a>
+                <p class="brand-tagline">Analyses, terrain et decryptage geopolitique</p>
+            </div>
+            <div class="header-actions">
+                <a href="/actualites" class="header-chip">A la une</a>
+                <a href="/actualites" class="header-chip">Newsletter</a>
+            </div>
+            <div class="header-categories">
+                <?php foreach (($categories ?? []) as $headerCategory): ?>
+                    <a
+                        href="/actualites?category=<?= (int) $headerCategory['id_categorie'] ?>"
+                        class="category-link <?= (int) ($article['id_categorie'] ?? 0) === (int) $headerCategory['id_categorie'] ? 'active' : '' ?>"
+                    >
+                        <?= htmlspecialchars((string) $headerCategory['nom_categorie']) ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </header>
 
     <main>
         <article class="article-container" itemscope itemtype="https://schema.org/NewsArticle">
@@ -334,7 +465,34 @@
     </main>
 
     <footer>
-        <p>&copy; <?= date('Y') ?> Journal d'Information - Tous droits réservés</p>
+        <div class="footer-inner">
+            <section>
+                <h4 class="footer-title">Journal d'Information</h4>
+                <p class="footer-text">Couverture continue des actualites, analyses de contexte et suivi terrain. Notre redaction publie des mises a jour quotidiennes avec verification des sources.</p>
+            </section>
+
+            <section>
+                <h4 class="footer-title">Navigation</h4>
+                <ul class="footer-list">
+                    <li><a href="/actualites">Retour aux actualites</a></li>
+                    <li><a href="/actualites">Les plus recents</a></li>
+                    <li><a href="/actualites">Themes suivis</a></li>
+                    <li><a href="/loginAdmin">Espace administration</a></li>
+                </ul>
+            </section>
+
+            <section>
+                <h4 class="footer-title">Contact Redaction</h4>
+                <p class="footer-text">Email: redaction@journalinfo.fr</p>
+                <p class="footer-text">Tel: +261 34 00 000 00</p>
+                <p class="footer-text">Lun-Ven: 08h00 - 18h00</p>
+            </section>
+        </div>
+
+        <div class="footer-bottom">
+            <span>&copy; <?= date('Y') ?> Journal d'Information. Tous droits reserves.</span>
+            <span>Mentions legales | Politique de confidentialite</span>
+        </div>
     </footer>
 </body>
 </html>

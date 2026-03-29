@@ -321,6 +321,7 @@ class ArticleController
     public function show(int $id): void
     {
         $article = $this->articleModel->getById($id);
+        $categories = $this->categoryModel->getAll();
 
         if (!$article) {
             Flight::redirect('/actualites?error=notfound');
@@ -329,6 +330,7 @@ class ArticleController
 
         Flight::render('front/article', [
             'article' => $article,
+            'categories' => $categories,
             'articleDetailsHtml' => $this->prepareArticleDetailsHtml((string) ($article['details'] ?? '')),
             'relatedArticles' => $this->getRelatedArticlesWithImage($id, 3),
         ]);
