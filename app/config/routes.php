@@ -21,7 +21,6 @@ $ArticleController = new ArticleController($articleModel, $categoryModel);
 $router->get('/', [$UserController, 'logPageAdmin']);
 $router->get('/loginAdmin', [$UserController, 'logPageAdmin']);
 $router->post('/login_admin', [$UserController, 'loginUser']);
-$router->get('/pageAdmin', [$UserController, 'pageAdmin']);
 
 // Routes CRUD Articles (BackOffice)
 $router->get('/admin/articles', [$ArticleController, 'index']);
