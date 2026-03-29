@@ -19,8 +19,13 @@ class ArticleController
      */
     public function index(): void
     {
-        $articles = $this->articleModel->getAll();
-        Flight::render('admin/articles', ['articles' => $articles]);
+        $search = trim((string) (Flight::request()->query->q ?? ''));
+        $articles = $this->articleModel->getAll($search === '' ? null : $search);
+
+        Flight::render('admin/articles', [
+            'articles' => $articles,
+            'search' => $search,
+        ]);
     }
 
     /**

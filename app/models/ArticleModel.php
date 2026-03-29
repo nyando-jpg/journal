@@ -14,9 +14,23 @@ class ArticleModel
     /**
      * Récupérer tous les articles (du plus récent au plus ancien)
      */
-    public function getAll(): array
+    public function getAll(?string $search = null): array
     {
-        $stmt = $this->db->query('SELECT ji.*, ju.nom AS admin_nom FROM journal_info ji LEFT JOIN journal_user ju ON ji.id_admin = ju.id_user ORDER BY ji.date DESC');
+        $sql = 'SELECT ji.*, ju.nom AS admin_nom FROM journal_info ji LEFT JOIN journal_user ju ON ji.id_admin = ju.id_user';
+
+        if ($search !== null && $search !== '') {
+            $sql .= ' WHERE ji.titre LIKE :search OR ji.details LIKE :search OR ju.nom LIKE :search OR ji.date LIKE :search OR CAST(ji.id AS CHAR) LIKE :search';
+        }
+
+        $sql .= ' ORDER BY ji.date DESC';
+        $stmt = $this->db->prepare($sql);
+
+        if ($search !== null && $search !== '') {
+            $like = '%' . $search . '%';
+            $stmt->bindValue(':search', $like);
+        }
+
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 

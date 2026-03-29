@@ -72,6 +72,20 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0 20px 0;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .search-input {
+            flex: 1;
+            min-width: 260px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -107,8 +121,26 @@
             <a href="/admin/articles/create" class="btn btn-primary">+ Nouvel Article</a>
         </nav>
 
+        <form action="/admin/articles" method="GET" class="search-bar">
+            <input
+                type="text"
+                name="q"
+                class="search-input"
+                placeholder="Rechercher par titre, contenu, auteur, date ou ID"
+                value="<?= htmlspecialchars($search ?? '') ?>"
+            >
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+            <?php if (!empty($search)): ?>
+                <a href="/admin/articles" class="btn">Effacer</a>
+            <?php endif; ?>
+        </form>
+
         <?php if (empty($articles)): ?>
-            <p>Aucun article pour le moment.</p>
+            <?php if (!empty($search)): ?>
+                <p>Aucun article trouvé pour la recherche "<?= htmlspecialchars($search) ?>".</p>
+            <?php else: ?>
+                <p>Aucun article pour le moment.</p>
+            <?php endif; ?>
         <?php else: ?>
             <table class="articles-table">
                 <thead>
