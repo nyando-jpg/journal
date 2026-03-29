@@ -3,9 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Article #<?= htmlspecialchars($article['id']) ?> - Admin</title>
+    <title><?= htmlspecialchars($article['titre']) ?> - Admin</title>
     <link rel="stylesheet" href="/assets/css/styles.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Merriweather", Georgia, serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        .site-header {
+            background-color: #0f172a;
+            color: #f8fafc;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+        }
+        .header-top {
+            background: #0b1220;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+            font-size: 0.86rem;
+        }
+        .header-top-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            color: #cbd5e1;
+        }
+        .header-main-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .brand-link {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 2rem;
+            line-height: 1.1;
+            font-family: "Playfair Display", "Times New Roman", serif;
+        }
+        .brand-tagline {
+            margin: 4px 0 0;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .header-chip {
+            border: 1px solid rgba(148, 163, 184, 0.55);
+            color: #e2e8f0;
+            text-decoration: none;
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 0.88rem;
+        }
+        .header-chip:hover {
+            background: rgba(148, 163, 184, 0.2);
+        }
+        .header-chip-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: #ffffff !important;
+            border: none;
+            padding: 10px 20px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s ease;
+        }
+        .header-chip-primary:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.6);
+            transform: translateY(-2px);
+        }
+        .header-categories {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            padding-top: 12px;
+            border-top: 1px solid rgba(148, 163, 184, 0.25);
+            width: 100%;
+        }
+        .category-link {
+            display: inline-block;
+            padding: 0;
+            background: none;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            transition: color 0.2s ease;
+        }
+        .category-link:hover,
+        .category-link.active {
+            color: #60a5fa;
+        }
+        main {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .page-title {
+            margin: 0 0 20px 0;
+            font-size: 1.8rem;
+            color: #1f2937;
+        }
         .article-card {
             margin-top: 20px;
             padding: 20px;
@@ -16,6 +134,50 @@
         .article-meta {
             margin-bottom: 20px;
             color: #666;
+        }
+        .article-header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            align-items: start;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .article-header-left h1 {
+            margin: 0 0 16px 0;
+            font-size: 2.2rem;
+            color: #0f172a;
+            line-height: 1.2;
+            font-family: "Playfair Display", "Times New Roman", serif;
+        }
+        .article-meta-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .meta-item {
+            display: flex;
+            gap: 8px;
+            font-size: 0.95rem;
+            align-items: center;
+        }
+        .meta-label {
+            font-weight: 600;
+            color: #475569;
+            min-width: 80px;
+        }
+        .meta-value {
+            color: #1f2937;
+            padding: 4px 10px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            border-left: 3px solid #3b82f6;
+        }
+        .article-actions-top {
+            display: flex;
+            gap: 8px;
+            justify-self: end;
         }
         .article-content {
             line-height: 1.7;
@@ -81,6 +243,17 @@
             cursor: pointer;
             border: none;
             font-size: 15px;
+        }
+        .btn-back {
+            background-color: transparent;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            padding: 6px 12px;
+            font-size: 14px;
+            transition: color 0.2s ease;
+        }
+        .btn-back:hover {
+            color: #64748b;
         }
         .btn-primary {
             background-color: #007bff;
@@ -199,13 +372,39 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1><?= htmlspecialchars($article['titre']) ?></h1>
+    <header class="site-header">
+        <div class="header-top">
+            <div class="header-top-inner">
+                <span>Espace Administration</span>
+                <span>Gestion des contenus et editeurs</span>
+            </div>
+        </div>
 
-        <nav style="margin-bottom: 20px;">
-            <a href="/admin/articles" class="btn">← Retour a la liste</a>
-        </nav>
+        <div class="header-main-inner">
+            <div>
+                <a href="/admin/articles?q=&category=0" class="brand-link">Journal d'Information</a>
+                <p class="brand-tagline">Espace d'administration</p>
+            </div>
+            <div class="header-actions">
+                <a href="/admin/articles?q=&category=0" class="header-chip">Tous les articles</a>
+                <a href="/admin/articles/create" class="header-chip header-chip-primary">➕ Nouvel Article</a>
+            </div>
+            <div class="header-categories">
+                <?php foreach (($categories ?? []) as $headerCategory): ?>
+                    <a
+                        href="/admin/articles?q=&category=<?= (int) $headerCategory['id_categorie'] ?>"
+                        class="category-link"
+                    >
+                        <?= htmlspecialchars((string) $headerCategory['nom_categorie']) ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </header>
 
+    <main>
+        <br><br><br><br><br><br><br>
+        <a href="/admin/articles?q=&category=0" class="btn btn-back">← Retour à la liste</a>
         <article class="article-card">
             <div class="article-meta">
                 <strong>Auteur:</strong> <?= htmlspecialchars($article['admin_nom'] ?? ('Admin #' . $article['id_admin'])) ?><br>
@@ -263,6 +462,6 @@
                 </div>
             <?php endif; ?>
         </article>
-    </div>
+    </main>
 </body>
 </html>

@@ -47,10 +47,13 @@ class ArticleController
             return;
         }
 
+        $categories = $this->categoryModel->getAll();
+
         Flight::render('admin/article_show', [
             'article' => $article,
             'articleDetailsHtml' => $this->prepareArticleDetailsHtml((string) ($article['details'] ?? '')),
             'relatedArticles' => $this->getRelatedArticlesWithImage($id, 3),
+            'categories' => $categories,
         ]);
     }
 
