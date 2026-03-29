@@ -82,6 +82,8 @@
         tinymce.init({
             selector: '#details',
             height: 500,
+            relative_urls: false,
+            document_base_url: '/',
             plugins: [
                 'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                 'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',

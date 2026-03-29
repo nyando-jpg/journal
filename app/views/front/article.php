@@ -194,7 +194,13 @@
             </div>
 
             <div class="article-content" itemprop="articleBody">
-                <?= $article['details'] ?>
+                <?= preg_replace_callback('/src="([^"]+)"/i', function($m) {
+                    $src = $m[1];
+                    if (strpos($src, '../../uploads/') === 0) {
+                        return 'src="' . str_replace('../../uploads/', '/uploads/', $src) . '"';
+                    }
+                    return $m[0];
+                }, $article['details']) ?>
             </div>
 
             <a href="/actualites" class="back-link">&larr; Retour aux actualités</a>

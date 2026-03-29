@@ -23,6 +23,12 @@
         .articles-table tr:nth-child(even) {
             background-color: #f9f9f9;
         }
+        .articles-table tbody tr {
+            cursor: pointer;
+        }
+        .articles-table tbody tr:hover {
+            background-color: #eef6ff;
+        }
         .btn {
             display: inline-block;
             padding: 8px 16px;
@@ -115,13 +121,13 @@
                 </thead>
                 <tbody>
                     <?php foreach ($articles as $article): ?>
-                        <tr>
+                        <tr onclick="window.location.href='/admin/articles/view/<?= (int) $article['id'] ?>'">
                             <td><?= htmlspecialchars($article['id']) ?></td>
                             <td><?= htmlspecialchars($article['date']) ?></td>
                             <td class="content-preview">
                                 <?= mb_substr(strip_tags($article['details']), 0, 100) ?>...
                             </td>
-                            <td>
+                            <td onclick="event.stopPropagation()">
                                 <a href="/admin/articles/edit/<?= $article['id'] ?>" class="btn btn-warning">Modifier</a>
                                 <a href="/admin/articles/delete/<?= $article['id'] ?>"
                                    class="btn btn-danger"

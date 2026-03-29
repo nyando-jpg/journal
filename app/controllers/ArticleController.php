@@ -24,6 +24,21 @@ class ArticleController
     }
 
     /**
+     * Afficher un article complet en mode admin
+     */
+    public function adminShow(int $id): void
+    {
+        $article = $this->articleModel->getById($id);
+
+        if (!$article) {
+            Flight::redirect('/admin/articles?error=notfound');
+            return;
+        }
+
+        Flight::render('admin/article_show', ['article' => $article]);
+    }
+
+    /**
      * Afficher le formulaire de création
      */
     public function create(): void
