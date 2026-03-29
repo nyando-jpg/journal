@@ -209,6 +209,7 @@
         <article class="article-card">
             <div class="article-meta">
                 <strong>Auteur:</strong> <?= htmlspecialchars($article['admin_nom'] ?? ('Admin #' . $article['id_admin'])) ?><br>
+                <strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe')) ?><br>
                 <strong>Date:</strong> <?= htmlspecialchars($article['date']) ?>
             </div>
             <div class="article-content">

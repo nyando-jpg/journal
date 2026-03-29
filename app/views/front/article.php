@@ -300,6 +300,9 @@
     <main>
         <article class="article-container" itemscope itemtype="https://schema.org/NewsArticle">
             <div class="article-meta">
+                <div>
+                    <strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe')) ?>
+                </div>
                 <time datetime="<?= $date->format('Y-m-d') ?>" itemprop="datePublished">
                     Publié le <?= $dateFormatted ?>
                 </time>

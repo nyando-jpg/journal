@@ -53,7 +53,13 @@
 
         <?php if (isset($_GET['error']) && $_GET['error'] === '1'): ?>
             <div class="alert alert-danger">
-                Le titre et le contenu de l'article sont obligatoires.
+                Le titre, la categorie et le contenu de l'article sont obligatoires.
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'category'): ?>
+            <div class="alert alert-danger">
+                La categorie selectionnee est invalide.
             </div>
         <?php endif; ?>
 
@@ -67,6 +73,21 @@
             <div class="form-group">
                 <label for="titre">Titre</label>
                 <input type="text" id="titre" name="titre" value="<?= $article ? htmlspecialchars($article['titre']) : '' ?>" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_categorie">Categorie</label>
+                <select id="id_categorie" name="id_categorie" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;" required>
+                    <option value="">Selectionner une categorie</option>
+                    <?php foreach (($categories ?? []) as $category): ?>
+                        <option
+                            value="<?= (int) $category['id_categorie'] ?>"
+                            <?= ($article && (int) ($article['id_categorie'] ?? 0) === (int) $category['id_categorie']) ? 'selected' : '' ?>
+                        >
+                            <?= htmlspecialchars((string) $category['nom_categorie']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
 
             <div class="form-group">

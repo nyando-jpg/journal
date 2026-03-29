@@ -209,8 +209,16 @@
                 placeholder="Rechercher par titre, contenu, auteur, date ou ID"
                 value="<?= htmlspecialchars($search ?? '') ?>"
             >
+            <select name="category" class="search-input" style="max-width: 260px;">
+                <option value="0">Toutes les categories</option>
+                <?php foreach (($categories ?? []) as $category): ?>
+                    <option value="<?= (int) $category['id_categorie'] ?>" <?= (int) ($selectedCategoryId ?? 0) === (int) $category['id_categorie'] ? 'selected' : '' ?>>
+                        <?= htmlspecialchars((string) $category['nom_categorie']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
             <button type="submit" class="btn btn-primary">Rechercher</button>
-            <?php if (!empty($search)): ?>
+            <?php if (!empty($search) || (int) ($selectedCategoryId ?? 0) > 0): ?>
                 <a href="/admin/articles" class="btn">Effacer</a>
             <?php endif; ?>
         </form>
@@ -254,6 +262,7 @@
 
                                 <h2 class="article-title"><?= htmlspecialchars($article['titre']) ?></h2>
                                 <p class="article-meta"><strong>Date:</strong> <?= htmlspecialchars($article['date']) ?></p>
+                                <p class="article-meta"><strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe')) ?></p>
                                 <p class="article-meta"><strong>Auteur:</strong> <?= htmlspecialchars($article['admin_nom'] ?? ('Admin #' . $article['id_admin'])) ?></p>
                                 <p class="content-preview">
                                     <?= mb_substr(strip_tags($article['details']), 0, 160) ?>...
@@ -285,6 +294,7 @@
                             <article class="article-card no-image" onclick="window.location.href='/admin/articles/view/<?= (int) $article['id'] ?>'">
                                 <h2 class="article-title"><?= htmlspecialchars($article['titre']) ?></h2>
                                 <p class="article-meta"><strong>Date:</strong> <?= htmlspecialchars($article['date']) ?></p>
+                                <p class="article-meta"><strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe')) ?></p>
                                 <p class="article-meta"><strong>Auteur:</strong> <?= htmlspecialchars($article['admin_nom'] ?? ('Admin #' . $article['id_admin'])) ?></p>
                                 <p class="content-preview">
                                     <?= mb_substr(strip_tags($article['details']), 0, 160) ?>...

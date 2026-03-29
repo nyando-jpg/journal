@@ -3,15 +3,18 @@
 namespace app\controllers;
 
 use app\models\ArticleModel;
+use app\models\CategoryModel;
 use Flight;
 
 class ArticleController
 {
     protected ArticleModel $articleModel;
+    protected CategoryModel $categoryModel;
 
-    public function __construct(ArticleModel $articleModel)
+    public function __construct(ArticleModel $articleModel, CategoryModel $categoryModel)
     {
         $this->articleModel = $articleModel;
+        $this->categoryModel = $categoryModel;
     }
 
     /**
@@ -20,11 +23,15 @@ class ArticleController
     public function index(): void
     {
         $search = trim((string) (Flight::request()->query->q ?? ''));
-        $articles = $this->articleModel->getAll($search === '' ? null : $search);
+        $selectedCategoryId = max(0, (int) (Flight::request()->query->category ?? 0));
+        $articles = $this->articleModel->getAll($search === '' ? null : $search, $selectedCategoryId > 0 ? $selectedCategoryId : null);
+        $categories = $this->categoryModel->getAll();
 
         Flight::render('admin/articles', [
             'articles' => $articles,
             'search' => $search,
+            'categories' => $categories,
+            'selectedCategoryId' => $selectedCategoryId,
         ]);
     }
 
@@ -52,8 +59,11 @@ class ArticleController
      */
     public function create(): void
     {
+        $categories = $this->categoryModel->getAll();
+
         Flight::render('admin/article_form', [
             'article' => null,
+            'categories' => $categories,
             'action' => '/admin/articles/store'
         ]);
     }
@@ -65,9 +75,15 @@ class ArticleController
     {
         $titre = trim((string) (Flight::request()->data->titre ?? ''));
         $details = Flight::request()->data->details ?? '';
+        $idCategorie = max(0, (int) (Flight::request()->data->id_categorie ?? 0));
 
-        if ($titre === '' || empty($details)) {
+        if ($titre === '' || empty($details) || $idCategorie <= 0) {
             Flight::redirect('/admin/articles/create?error=1');
+            return;
+        }
+
+        if (!$this->categoryModel->exists($idCategorie)) {
+            Flight::redirect('/admin/articles/create?error=category');
             return;
         }
 
@@ -78,7 +94,7 @@ class ArticleController
         }
 
         $idAdmin = (int) ($_SESSION['user_id'] ?? 1);
-        $this->articleModel->create($idAdmin, $titre, $details);
+        $this->articleModel->create($idAdmin, $idCategorie, $titre, $details);
         Flight::redirect('/admin/articles?success=created');
     }
 
@@ -94,8 +110,11 @@ class ArticleController
             return;
         }
 
+        $categories = $this->categoryModel->getAll();
+
         Flight::render('admin/article_form', [
             'article' => $article,
+            'categories' => $categories,
             'action' => '/admin/articles/update/' . $id
         ]);
     }
@@ -107,9 +126,15 @@ class ArticleController
     {
         $titre = trim((string) (Flight::request()->data->titre ?? ''));
         $details = Flight::request()->data->details ?? '';
+        $idCategorie = max(0, (int) (Flight::request()->data->id_categorie ?? 0));
 
-        if ($titre === '' || empty($details)) {
+        if ($titre === '' || empty($details) || $idCategorie <= 0) {
             Flight::redirect('/admin/articles/edit/' . $id . '?error=1');
+            return;
+        }
+
+        if (!$this->categoryModel->exists($idCategorie)) {
+            Flight::redirect('/admin/articles/edit/' . $id . '?error=category');
             return;
         }
 
@@ -120,7 +145,7 @@ class ArticleController
         }
 
         $idAdmin = (int) ($_SESSION['user_id'] ?? 1);
-        $this->articleModel->update($id, $idAdmin, $titre, $details);
+        $this->articleModel->update($id, $idAdmin, $idCategorie, $titre, $details);
         Flight::redirect('/admin/articles?success=updated');
     }
 
@@ -276,12 +301,16 @@ class ArticleController
     public function home(): void
     {
         $search = trim((string) (Flight::request()->query->q ?? ''));
+        $selectedCategoryId = max(0, (int) (Flight::request()->query->category ?? 0));
         $currentPage = max(1, (int) (Flight::request()->query->page ?? 1));
-        $articles = $this->articleModel->getAll($search === '' ? null : $search);
+        $articles = $this->articleModel->getAll($search === '' ? null : $search, $selectedCategoryId > 0 ? $selectedCategoryId : null);
+        $categories = $this->categoryModel->getAll();
 
         Flight::render('front/home', [
             'articles' => $articles,
             'search' => $search,
+            'categories' => $categories,
+            'selectedCategoryId' => $selectedCategoryId,
             'currentPage' => $currentPage,
         ]);
     }

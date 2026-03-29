@@ -14,7 +14,8 @@ $userModel = Flight::UserModel();
 $UserController = new UserController($userModel);
 
 $articleModel = Flight::ArticleModel();
-$ArticleController = new ArticleController($articleModel);
+$categoryModel = Flight::CategoryModel();
+$ArticleController = new ArticleController($articleModel, $categoryModel);
 
 // Routes principales
 $router->get('/', [$UserController, 'logPageAdmin']);
