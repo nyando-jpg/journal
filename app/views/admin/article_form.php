@@ -53,7 +53,7 @@
 
         <?php if (isset($_GET['error']) && $_GET['error'] === '1'): ?>
             <div class="alert alert-danger">
-                Le contenu de l'article ne peut pas être vide.
+                Le titre et le contenu de l'article sont obligatoires.
             </div>
         <?php endif; ?>
 
@@ -64,6 +64,11 @@
         <?php endif; ?>
 
         <form action="<?= htmlspecialchars($action) ?>" method="POST">
+            <div class="form-group">
+                <label for="titre">Titre</label>
+                <input type="text" id="titre" name="titre" value="<?= $article ? htmlspecialchars($article['titre']) : '' ?>" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;" required>
+            </div>
+
             <div class="form-group">
                 <label for="details">Contenu de l'article</label>
                 <textarea id="details" name="details"><?= $article ? htmlspecialchars($article['details']) : '' ?></textarea>

@@ -54,9 +54,10 @@ class ArticleController
      */
     public function store(): void
     {
+        $titre = trim((string) (Flight::request()->data->titre ?? ''));
         $details = Flight::request()->data->details ?? '';
 
-        if (empty($details)) {
+        if ($titre === '' || empty($details)) {
             Flight::redirect('/admin/articles/create?error=1');
             return;
         }
@@ -67,7 +68,8 @@ class ArticleController
             return;
         }
 
-        $this->articleModel->create($details);
+        $idAdmin = (int) ($_SESSION['user_id'] ?? 1);
+        $this->articleModel->create($idAdmin, $titre, $details);
         Flight::redirect('/admin/articles?success=created');
     }
 
@@ -94,9 +96,10 @@ class ArticleController
      */
     public function update(int $id): void
     {
+        $titre = trim((string) (Flight::request()->data->titre ?? ''));
         $details = Flight::request()->data->details ?? '';
 
-        if (empty($details)) {
+        if ($titre === '' || empty($details)) {
             Flight::redirect('/admin/articles/edit/' . $id . '?error=1');
             return;
         }
@@ -107,7 +110,8 @@ class ArticleController
             return;
         }
 
-        $this->articleModel->update($id, $details);
+        $idAdmin = (int) ($_SESSION['user_id'] ?? 1);
+        $this->articleModel->update($id, $idAdmin, $titre, $details);
         Flight::redirect('/admin/articles?success=updated');
     }
 

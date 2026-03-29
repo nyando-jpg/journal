@@ -16,7 +16,7 @@ class ArticleModel
      */
     public function getAll(): array
     {
-        $stmt = $this->db->query('SELECT * FROM journal_info ORDER BY date DESC');
+        $stmt = $this->db->query('SELECT ji.*, ju.nom AS admin_nom FROM journal_info ji LEFT JOIN journal_user ju ON ji.id_admin = ju.id_user ORDER BY ji.date DESC');
         return $stmt->fetchAll();
     }
 
@@ -25,7 +25,7 @@ class ArticleModel
      */
     public function getById(int $id): ?array
     {
-        $stmt = $this->db->prepare('SELECT * FROM journal_info WHERE id = ?');
+        $stmt = $this->db->prepare('SELECT ji.*, ju.nom AS admin_nom FROM journal_info ji LEFT JOIN journal_user ju ON ji.id_admin = ju.id_user WHERE ji.id = ?');
         $stmt->execute([$id]);
         $result = $stmt->fetch();
         return $result ?: null;
@@ -34,19 +34,19 @@ class ArticleModel
     /**
      * Créer un nouvel article
      */
-    public function create(string $details): bool
+    public function create(int $idAdmin, string $titre, string $details): bool
     {
-        $stmt = $this->db->prepare('INSERT INTO journal_info (date, details) VALUES (NOW(), ?)');
-        return $stmt->execute([$details]);
+        $stmt = $this->db->prepare('INSERT INTO journal_info (date, id_admin, titre, details) VALUES (NOW(), ?, ?, ?)');
+        return $stmt->execute([$idAdmin, $titre, $details]);
     }
 
     /**
      * Mettre à jour un article
      */
-    public function update(int $id, string $details): bool
+    public function update(int $id, int $idAdmin, string $titre, string $details): bool
     {
-        $stmt = $this->db->prepare('UPDATE journal_info SET details = ? WHERE id = ?');
-        return $stmt->execute([$details, $id]);
+        $stmt = $this->db->prepare('UPDATE journal_info SET id_admin = ?, titre = ?, details = ? WHERE id = ?');
+        return $stmt->execute([$idAdmin, $titre, $details, $id]);
     }
 
     /**

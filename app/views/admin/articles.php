@@ -114,7 +114,9 @@
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Titre</th>
                         <th>Date</th>
+                        <th>Auteur</th>
                         <th>Aperçu</th>
                         <th>Actions</th>
                     </tr>
@@ -123,7 +125,9 @@
                     <?php foreach ($articles as $article): ?>
                         <tr onclick="window.location.href='/admin/articles/view/<?= (int) $article['id'] ?>'">
                             <td><?= htmlspecialchars($article['id']) ?></td>
+                            <td><?= htmlspecialchars($article['titre']) ?></td>
                             <td><?= htmlspecialchars($article['date']) ?></td>
+                            <td><?= htmlspecialchars($article['admin_nom'] ?? ('Admin #' . $article['id_admin'])) ?></td>
                             <td class="content-preview">
                                 <?= mb_substr(strip_tags($article['details']), 0, 100) ?>...
                             </td>

@@ -49,7 +49,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Article #<?= htmlspecialchars($article['id']) ?></h1>
+        <h1><?= htmlspecialchars($article['titre']) ?></h1>
 
         <nav style="margin-bottom: 20px;">
             <a href="/admin/articles" class="btn">← Retour a la liste</a>
@@ -63,6 +63,9 @@
 
         <article class="article-card">
             <div class="article-meta">
+                <strong>ID:</strong> <?= htmlspecialchars($article['id']) ?><br>
+                <strong>ID Admin:</strong> <?= htmlspecialchars($article['id_admin']) ?><br>
+                <strong>Auteur:</strong> <?= htmlspecialchars($article['admin_nom'] ?? ('Admin #' . $article['id_admin'])) ?><br>
                 <strong>Date:</strong> <?= htmlspecialchars($article['date']) ?>
             </div>
             <div class="article-content">

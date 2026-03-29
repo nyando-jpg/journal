@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <?php
-    // Extraire le titre de l'article
-    preg_match('/<h[1-6][^>]*>(.*?)<\/h[1-6]>/i', $article['details'], $matches);
-    $title = isset($matches[1]) ? strip_tags($matches[1]) : 'Article';
+    $title = $article['titre'] ?? 'Article';
 
     // Extraire une description (premiers 160 caractères)
     $description = mb_substr(strip_tags($article['details']), 0, 160);
