@@ -66,13 +66,39 @@ try {
 $articlesWithImage = [];
 $articlesWithoutImage = [];
 
+function normalize_image_src_for_simple_php(string $src): string
+{
+    $src = trim($src);
+    if ($src === '') {
+        return '';
+    }
+
+    if (strpos($src, '/simple-php-login/uploads/') === 0) {
+        return $src;
+    }
+    if (strpos($src, '../../uploads/') === 0) {
+        return str_replace('../../uploads/', '/simple-php-login/uploads/', $src);
+    }
+    if (strpos($src, '../uploads/') === 0) {
+        return str_replace('../uploads/', '/simple-php-login/uploads/', $src);
+    }
+    if (strpos($src, './uploads/') === 0) {
+        return str_replace('./uploads/', '/simple-php-login/uploads/', $src);
+    }
+    if (strpos($src, '/uploads/') === 0) {
+        return str_replace('/uploads/', '/simple-php-login/uploads/', $src);
+    }
+    if (strpos($src, 'uploads/') === 0) {
+        return '/simple-php-login/' . $src;
+    }
+
+    return $src;
+}
+
 foreach ($articles as $article) {
     $firstImage = null;
     if (preg_match('/<img[^>]+src=["\']([^"\']+)["\']/i', (string) ($article['details'] ?? ''), $match) === 1) {
-        $firstImage = $match[1];
-        if (strpos($firstImage, '../../uploads/') === 0) {
-            $firstImage = str_replace('../../uploads/', '/uploads/', $firstImage);
-        }
+        $firstImage = normalize_image_src_for_simple_php((string) $match[1]);
     }
 
     if (!empty($firstImage)) {
@@ -393,7 +419,7 @@ foreach ($articles as $article) {
             </div>
             <div class="header-actions">
                 <a href="index.php?q=&category=0" class="header-chip">Tous les articles</a>
-                <a href="#" class="header-chip header-chip-primary">+ Nouvel Article</a>
+                <a href="create.php" class="header-chip header-chip-primary">+ Nouvel Article</a>
             </div>
             <div class="header-categories">
                 <?php foreach ($categories as $headerCategory): ?>
@@ -410,6 +436,30 @@ foreach ($articles as $article) {
 
     <main>
         <h2 class="page-title">Gestion des Articles</h2>
+
+        <?php if (isset($_GET['success'])): ?>
+            <div class="alert alert-success">
+                <?php
+                switch ((string) $_GET['success']) {
+                    case 'created':
+                        echo 'Article cree avec succes !';
+                        break;
+                    case 'updated':
+                        echo 'Article modifie avec succes !';
+                        break;
+                    case 'deleted':
+                        echo 'Article supprime avec succes !';
+                        break;
+                }
+                ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['error'])): ?>
+            <div class="alert alert-danger">
+                Article non trouve.
+            </div>
+        <?php endif; ?>
 
         <?php if ($dbError !== ''): ?>
             <div class="alert alert-danger"><?= htmlspecialchars($dbError, ENT_QUOTES, 'UTF-8') ?></div>
@@ -461,11 +511,11 @@ foreach ($articles as $article) {
                                 </p>
 
                                 <div class="card-actions" onclick="event.stopPropagation()">
-                                    <a href="#" class="btn btn-warning btn-icon" title="Modifier" aria-label="Modifier">
+                                    <a href="edit.php?id=<?= (int) $article['id'] ?>" class="btn btn-warning btn-icon" title="Modifier" aria-label="Modifier">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm18.71-11.04a1.004 1.004 0 0 0 0-1.42l-2.5-2.5a1.004 1.004 0 0 0-1.42 0L15.13 4.95l3.75 3.75 2.83-2.49z"/></svg>
                                         <span class="sr-only">Modifier</span>
                                     </a>
-                                    <a href="#" class="btn btn-danger btn-icon" title="Supprimer" aria-label="Supprimer">
+                                    <a href="delete.php?id=<?= (int) $article['id'] ?>" class="btn btn-danger btn-icon" title="Supprimer" aria-label="Supprimer" onclick="return confirm('Etes-vous sur de vouloir supprimer cet article ?')">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 2h4v2H4V6h4l1-2z"/></svg>
                                         <span class="sr-only">Supprimer</span>
                                     </a>
@@ -489,11 +539,11 @@ foreach ($articles as $article) {
                                 </p>
 
                                 <div class="card-actions" onclick="event.stopPropagation()">
-                                    <a href="#" class="btn btn-warning btn-icon" title="Modifier" aria-label="Modifier">
+                                    <a href="edit.php?id=<?= (int) $article['id'] ?>" class="btn btn-warning btn-icon" title="Modifier" aria-label="Modifier">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm18.71-11.04a1.004 1.004 0 0 0 0-1.42l-2.5-2.5a1.004 1.004 0 0 0-1.42 0L15.13 4.95l3.75 3.75 2.83-2.49z"/></svg>
                                         <span class="sr-only">Modifier</span>
                                     </a>
-                                    <a href="#" class="btn btn-danger btn-icon" title="Supprimer" aria-label="Supprimer">
+                                    <a href="delete.php?id=<?= (int) $article['id'] ?>" class="btn btn-danger btn-icon" title="Supprimer" aria-label="Supprimer" onclick="return confirm('Etes-vous sur de vouloir supprimer cet article ?')">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 2h4v2H4V6h4l1-2z"/></svg>
                                         <span class="sr-only">Supprimer</span>
                                     </a>

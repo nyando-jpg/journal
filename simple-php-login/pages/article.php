@@ -30,17 +30,23 @@ function normalize_image_src(string $src): string
         return '';
     }
 
+    if (strpos($src, '/simple-php-login/uploads/') === 0) {
+        return $src;
+    }
     if (strpos($src, '../../uploads/') === 0) {
-        return str_replace('../../uploads/', '/uploads/', $src);
+        return str_replace('../../uploads/', '/simple-php-login/uploads/', $src);
     }
     if (strpos($src, '../uploads/') === 0) {
-        return str_replace('../uploads/', '/uploads/', $src);
+        return str_replace('../uploads/', '/simple-php-login/uploads/', $src);
     }
     if (strpos($src, './uploads/') === 0) {
-        return str_replace('./uploads/', '/uploads/', $src);
+        return str_replace('./uploads/', '/simple-php-login/uploads/', $src);
+    }
+    if (strpos($src, '/uploads/') === 0) {
+        return str_replace('/uploads/', '/simple-php-login/uploads/', $src);
     }
     if (strpos($src, 'uploads/') === 0) {
-        return '/' . $src;
+        return '/simple-php-login/' . $src;
     }
 
     return $src;
@@ -89,7 +95,7 @@ try {
     foreach ($relatedRows as $row) {
         $firstImage = extract_first_image_from_details((string) ($row['details'] ?? ''));
         if ($firstImage === '') {
-            $firstImage = '/uploads/image.png';
+            $firstImage = '/simple-php-login/uploads/image.png';
         }
 
         $row['first_image'] = $firstImage;
@@ -102,7 +108,13 @@ try {
 $articleDetailsHtml = '';
 if (is_array($article) && isset($article['details'])) {
     $articleDetailsHtml = (string) $article['details'];
-    $articleDetailsHtml = str_replace(['../../uploads/', '../uploads/', './uploads/', 'src="uploads/', "src='uploads/"], ['/uploads/', '/uploads/', '/uploads/', 'src="/uploads/', "src='/uploads/"], $articleDetailsHtml);
+    $articleDetailsHtml = preg_replace_callback(
+        '/(<img[^>]+src=["\'])([^"\']+)(["\'])/i',
+        static function (array $matches): string {
+            return $matches[1] . normalize_image_src((string) $matches[2]) . $matches[3];
+        },
+        $articleDetailsHtml
+    ) ?? $articleDetailsHtml;
 }
 ?>
 <!DOCTYPE html>
@@ -306,7 +318,7 @@ if (is_array($article) && isset($article['details'])) {
             </div>
             <div class="header-actions">
                 <a href="index.php?q=&category=0" class="header-chip">Tous les articles</a>
-                <a href="#" class="header-chip header-chip-primary">+ Nouvel article</a>
+                <a href="create.php" class="header-chip header-chip-primary">+ Nouvel article</a>
             </div>
         </div>
         <div class="header-categories">
@@ -346,11 +358,11 @@ if (is_array($article) && isset($article['details'])) {
                         </div>
                     </div>
                     <div class="article-actions-top">
-                        <a href="#" class="btn-icon btn-warning" title="Modifier" aria-label="Modifier">
+                        <a href="edit.php?id=<?= (int) $article['id'] ?>" class="btn-icon btn-warning" title="Modifier" aria-label="Modifier">
                             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm18.71-11.04a1 1 0 0 0 0-1.42l-2.5-2.5a1 1 0 0 0-1.42 0L15.13 4.95l3.75 3.75 2.83-2.49z"/></svg>
                             <span class="sr-only">Modifier</span>
                         </a>
-                        <a href="#" class="btn-icon btn-danger" title="Supprimer" aria-label="Supprimer">
+                        <a href="delete.php?id=<?= (int) $article['id'] ?>" class="btn-icon btn-danger" title="Supprimer" aria-label="Supprimer" onclick="return confirm('Etes-vous sur de vouloir supprimer cet article ?')">
                             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 2h4v2H4V6h4l1-2z"/></svg>
                             <span class="sr-only">Supprimer</span>
                         </a>
