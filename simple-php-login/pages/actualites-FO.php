@@ -123,10 +123,10 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
         body { font-family: "Merriweather", Georgia, serif; line-height: 1.8; color: #333; background-color: #f5f5f5; }
         .site-header { background-color: #0f172a; color: #f8fafc; border-bottom: 1px solid rgba(148, 163, 184, 0.35); }
         .header-top { background: #0b1220; border-bottom: 1px solid rgba(148, 163, 184, 0.25); font-size: 0.86rem; }
-        .header-top-inner { max-width: 1200px; margin: 0 auto; padding: 8px 20px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: #cbd5e1; }
+        .header-top-inner { max-width: 1200px; margin: 0 auto; padding: 8px 20px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: #e2e8f0; }
         .header-main-inner { max-width: 1200px; margin: 0 auto; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
         .brand-link { color: #ffffff; text-decoration: none; font-size: 2rem; line-height: 1.1; font-family: "Playfair Display", "Times New Roman", serif; }
-        .brand-tagline { margin: 4px 0 0; font-size: 0.95rem; color: #cbd5e1; }
+        .brand-tagline { margin: 4px 0 0; font-size: 0.95rem; color: #e2e8f0; }
         .header-categories { display: flex; gap: 16px; flex-wrap: wrap; padding-top: 12px; border-top: 1px solid rgba(148, 163, 184, 0.25); }
         .category-link { display: inline-block; color: #ffffff; text-decoration: none; font-size: 0.9rem; font-weight: 500; }
         .category-link:hover, .category-link.active { color: #60a5fa; }
@@ -144,12 +144,12 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
         .article-card:hover { box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12); transform: translateY(-2px); }
         .article-title { margin: 0 0 10px 0; font-size: 1.1rem; color: #1f2937; }
         .article-thumb { width: 100%; height: 180px; object-fit: cover; border-radius: 6px; margin-bottom: 12px; border: 1px solid #ececec; background: #f5f5f5; }
-        .article-meta { margin: 4px 0; color: #555; font-size: 0.93rem; }
-        .content-preview { margin-top: 10px; min-height: 60px; max-height: 100px; overflow: hidden; text-overflow: ellipsis; color: #333; }
+        .article-meta { margin: 4px 0; color: #374151; font-size: 0.93rem; }
+        .content-preview { margin-top: 10px; min-height: 60px; max-height: 100px; overflow: hidden; text-overflow: ellipsis; color: #1f2937; }
         .article-card.no-image { border-left: 4px solid #334155; }
         .side-title { margin: 0 0 8px 0; font-size: 1rem; color: #334155; text-transform: uppercase; letter-spacing: 0.05em; }
-        .card-read { margin-top: 12px; display: inline-block; color: #0f3b8a; text-decoration: none; font-weight: 600; }
-        .card-read:hover { text-decoration: underline; }
+        .card-read { margin-top: 12px; display: inline-block; color: #1d4ed8; text-decoration: underline; font-weight: 600; min-height: 44px; line-height: 44px; }
+        .card-read:hover { text-decoration: none; color: #1e40af; }
         .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
         .pagination-link { display: inline-flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 10px; border: 1px solid #cbd5e1; border-radius: 6px; color: #1e293b; text-decoration: none; background: #fff; font-weight: 600; }
         .pagination-link.active { background: #0f3b8a; border-color: #0f3b8a; color: #fff; }
@@ -159,10 +159,10 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
         footer { background-color: #121629; color: #e5e7eb; padding: 38px 20px 20px; margin-top: 50px; }
         .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 24px; }
         .footer-title { margin: 0 0 10px 0; font-size: 1rem; color: #ffffff; letter-spacing: 0.04em; text-transform: uppercase; }
-        .footer-text { margin: 0; color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; }
+        .footer-text { margin: 0; color: #e2e8f0; font-size: 0.95rem; line-height: 1.7; }
         .footer-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
-        .footer-list a { color: #cbd5e1; text-decoration: none; font-size: 0.95rem; }
-        .footer-bottom { max-width: 1200px; margin: 18px auto 0; padding-top: 16px; border-top: 1px solid rgba(148, 163, 184, 0.35); color: #94a3b8; font-size: 0.9rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .footer-list a { color: #e2e8f0; text-decoration: underline; font-size: 0.95rem; }
+        .footer-bottom { max-width: 1200px; margin: 18px auto 0; padding-top: 16px; border-top: 1px solid rgba(148, 163, 184, 0.35); color: #cbd5e1; font-size: 0.9rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
         @media (max-width: 1100px) { .articles-layout { grid-template-columns: 1fr; } .articles-without-image { grid-template-columns: repeat(2, minmax(0, 1fr)); } .footer-inner { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 760px) { .articles-with-image, .articles-without-image { grid-template-columns: 1fr; } .footer-inner { grid-template-columns: 1fr; } .footer-bottom { flex-direction: column; align-items: flex-start; } }
     </style>
@@ -228,7 +228,7 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
                         <div class="articles-with-image">
                             <?php foreach ($pagedArticlesWithImage as $article): ?>
                                 <article class="article-card" onclick="window.location.href='/Iran/article/<?= (int) $article['id'] ?>.html'">
-                                    <img src="<?= htmlspecialchars((string) $article['first_image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?>" class="article-thumb">
+                                    <img src="<?= htmlspecialchars((string) $article['first_image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?>" class="article-thumb" loading="lazy" decoding="async" width="400" height="180">
                                     <h2 class="article-title"><?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?></h2>
                                     <p class="article-meta"><strong>Date:</strong> <?= htmlspecialchars((string) $article['date'], ENT_QUOTES, 'UTF-8') ?></p>
                                     <p class="article-meta"><strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe'), ENT_QUOTES, 'UTF-8') ?></p>
@@ -329,8 +329,8 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
         <div class="footer-bottom">
             <span>&copy; <?= date('Y') ?> Journal d'Information. Tous droits reserves.</span>
             <div>
-                <a href="#" style="color: #cbd5e1; text-decoration: none; margin-left: 15px;">Mentions legales</a>
-                <a href="#" style="color: #cbd5e1; text-decoration: none; margin-left: 15px;">Politique de confidentialite</a>
+                <a href="#" style="color: #e2e8f0; text-decoration: underline; margin-left: 15px;">Mentions legales</a>
+                <a href="#" style="color: #e2e8f0; text-decoration: underline; margin-left: 15px;">Politique de confidentialite</a>
             </div>
         </div>
     </footer>
