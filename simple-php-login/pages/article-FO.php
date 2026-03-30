@@ -139,7 +139,16 @@ if (is_array($article)) {
         .related-date { margin: 0 0 6px 0; font-size: 0.85rem; color: #6b7280; }
         .related-name { margin: 0; font-size: 0.95rem; color: #111827; }
         .back-link { display: inline-block; margin-top: 30px; padding: 12px 25px; background-color: #e94560; color: white; text-decoration: none; border-radius: 5px; }
-        @media (max-width: 900px) { .article-container { padding: 25px; } .related-grid { grid-template-columns: 1fr; } }
+        .site-footer { background-color: #0f172a; color: #f8fafc; border-top: 1px solid rgba(148, 163, 184, 0.35); }
+        .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 24px; padding: 38px 20px 0; }
+        .footer-title { margin: 0 0 10px 0; font-size: 1rem; color: #ffffff; letter-spacing: 0.04em; text-transform: uppercase; }
+        .footer-text { margin: 0 0 8px 0; color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; }
+        .footer-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+        .footer-list a { color: #cbd5e1; text-decoration: none; font-size: 0.95rem; }
+        .footer-list a:hover { color: #60a5fa; }
+        .footer-bottom { max-width: 1200px; margin: 18px auto 0; padding: 16px 20px; border-top: 1px solid rgba(148, 163, 184, 0.35); color: #94a3b8; font-size: 0.9rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        @media (max-width: 900px) { .article-container { padding: 25px; } .related-grid { grid-template-columns: 1fr; } .footer-inner { grid-template-columns: 1fr 1fr; } .footer-bottom { flex-direction: column; } }
+        @media (max-width: 600px) { .footer-inner { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -200,5 +209,35 @@ if (is_array($article)) {
             </article>
         <?php endif; ?>
     </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div>
+                <h3 class="footer-title">Journal d'Information</h3>
+                <p class="footer-text">Analyses approfondies et couverture complete de l'actualite geopolitique. Decryptage des enjeux majeurs et perspectives strategiques.</p>
+            </div>
+            <div>
+                <h3 class="footer-title">Categories</h3>
+                <ul class="footer-list">
+                    <?php foreach (array_slice($categories, 0, 5) as $cat): ?>
+                        <li><a href="actualites-FO.php?category=<?= (int) $cat['id_categorie'] ?>"><?= htmlspecialchars((string) $cat['nom_categorie'], ENT_QUOTES, 'UTF-8') ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <div>
+                <h3 class="footer-title">Contact</h3>
+                <p class="footer-text"><strong>Email :</strong> redaction@journalinfo.fr</p>
+                <p class="footer-text"><strong>Tel :</strong> +33 (0)1 XX XX XX XX</p>
+                <p class="footer-text"><strong>Adresse :</strong> Paris, France</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; <?= date('Y') ?> Journal d'Information. Tous droits reserves.</span>
+            <div>
+                <a href="#" style="color: #cbd5e1; text-decoration: none; margin-left: 15px;">Mentions legales</a>
+                <a href="#" style="color: #cbd5e1; text-decoration: none; margin-left: 15px;">Politique de confidentialite</a>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

@@ -299,5 +299,35 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
             <?php endif; ?>
         </section>
     </main>
+
+    <footer class="site-header">
+        <div class="footer-inner">
+            <div>
+                <h3 class="footer-title">Journal d'Information</h3>
+                <p class="footer-text">Analyses approfondies et couverture complete de l'actualite geopolitique. Decryptage des enjeux majeurs et perspectives strategiques.</p>
+            </div>
+            <div>
+                <h3 class="footer-title">Categories</h3>
+                <ul class="footer-list">
+                    <?php foreach (array_slice($categories, 0, 5) as $cat): ?>
+                        <li><a href="actualites-FO.php?category=<?= (int) $cat['id_categorie'] ?>"><?= htmlspecialchars((string) $cat['nom_categorie'], ENT_QUOTES, 'UTF-8') ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <div>
+                <h3 class="footer-title">Contact</h3>
+                <p class="footer-text"><strong>Email :</strong> redaction@journalinfo.fr</p>
+                <p class="footer-text"><strong>Tel :</strong> +33 (0)1 XX XX XX XX</p>
+                <p class="footer-text"><strong>Adresse :</strong> Paris, France</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; <?= date('Y') ?> Journal d'Information. Tous droits reserves.</span>
+            <div>
+                <a href="#" style="color: #cbd5e1; text-decoration: none; margin-left: 15px;">Mentions legales</a>
+                <a href="#" style="color: #cbd5e1; text-decoration: none; margin-left: 15px;">Politique de confidentialite</a>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
