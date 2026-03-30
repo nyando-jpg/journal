@@ -50,7 +50,7 @@ class UserController
     
             // Vérifier si l'utilisateur est admin
             if ($this->userModel->isAdmin($user['id_user'])) { // Vérification admin avec `id_client`
-                Flight::redirect('/admin/articles?q=&category=0'); // Redirection pour les admins
+                Flight::redirect('pageAdmin'); // Redirection pour les admins
             } else {
                 Flight::redirect('index'); // Redirection pour les utilisateurs normaux
             }
@@ -87,5 +87,9 @@ class UserController
     {
         Flight::render('index'); // Rendre la vue index.php
     }
-
+    public function pageAdmin()
+    {
+        Flight::render('pageAdmin'); // Rendre la vue index.php
+    }
+    
 }
