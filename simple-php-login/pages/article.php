@@ -12,8 +12,29 @@ if (!isset($_SESSION['user_id'], $_SESSION['user_name'], $_SESSION['is_admin']))
 
 require __DIR__ . '/../config/db.php';
 
+function slugify_admin_title(string $title): string
+{
+    $slug = trim($title);
+    if ($slug === '') {
+        return 'article';
+    }
+
+    $transliterated = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $slug);
+    if ($transliterated !== false) {
+        $slug = $transliterated;
+    }
+
+    $slug = strtolower($slug);
+    $slug = preg_replace('/[^a-z0-9]+/', '-', $slug) ?? '';
+    $slug = trim($slug, '-');
+
+    return $slug !== '' ? $slug : 'article';
+}
+
 $articleId = max(0, (int) ($_GET['id'] ?? 0));
-if ($articleId <= 0) {
+$articleSlug = slugify_admin_title(rawurldecode(trim((string) ($_GET['slug'] ?? ''))));
+
+if ($articleId <= 0 && $articleSlug === 'article') {
     header('Location: index.php?error=notfound');
     exit;
 }
@@ -75,6 +96,22 @@ function extract_first_image_from_details(string $details): string
 
 try {
     $pdo = db_connect();
+
+    if ($articleId <= 0 && $articleSlug !== 'article') {
+        $slugStmt = $pdo->query('SELECT id, titre FROM journal_info ORDER BY date DESC, id DESC');
+        $slugRows = $slugStmt->fetchAll();
+        foreach ($slugRows as $slugRow) {
+            if (slugify_admin_title((string) ($slugRow['titre'] ?? '')) === $articleSlug) {
+                $articleId = (int) $slugRow['id'];
+                break;
+            }
+        }
+    }
+
+    if ($articleId <= 0) {
+        header('Location: index.php?error=notfound');
+        exit;
+    }
 
     $catStmt = $pdo->query('SELECT id_categorie, nom_categorie FROM journal_categories ORDER BY nom_categorie ASC');
     $categories = $catStmt->fetchAll();

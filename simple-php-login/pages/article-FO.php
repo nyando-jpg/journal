@@ -5,7 +5,34 @@ declare(strict_types=1);
 require __DIR__ . '/../config/db.php';
 
 $articleId = max(0, (int) ($_GET['id'] ?? 0));
-if ($articleId <= 0) {
+$articleSlug = slugify_public_title(rawurldecode(trim((string) ($_GET['slug'] ?? ''))));
+
+function slugify_public_title(string $title): string
+{
+    $slug = trim($title);
+    if ($slug === '') {
+        return 'article';
+    }
+
+    $transliterated = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $slug);
+    if ($transliterated !== false) {
+        $slug = $transliterated;
+    }
+
+    $slug = strtolower($slug);
+    $slug = preg_replace('/[^a-z0-9]+/', '-', $slug) ?? '';
+    $slug = trim($slug, '-');
+
+    return $slug !== '' ? $slug : 'article';
+}
+
+function build_public_article_url(array $article): string
+{
+    $title = (string) ($article['titre'] ?? 'article');
+    return '/Iran/article/' . rawurlencode(slugify_public_title($title)) . '.html';
+}
+
+if ($articleId <= 0 && $articleSlug === '') {
     header('Location: /Iran/actualites.html?error=notfound');
     exit;
 }
@@ -62,6 +89,22 @@ function extract_first_image_from_details_front(string $details): string
 
 try {
     $pdo = db_connect();
+
+    if ($articleId <= 0 && $articleSlug !== '') {
+        $slugStmt = $pdo->query('SELECT id, titre FROM journal_info ORDER BY date DESC, id DESC');
+        $slugRows = $slugStmt->fetchAll();
+        foreach ($slugRows as $slugRow) {
+            if (slugify_public_title((string) ($slugRow['titre'] ?? '')) === $articleSlug) {
+                $articleId = (int) $slugRow['id'];
+                break;
+            }
+        }
+    }
+
+    if ($articleId <= 0) {
+        header('Location: /Iran/actualites.html?error=notfound');
+        exit;
+    }
 
     $catStmt = $pdo->query('SELECT id_categorie, nom_categorie FROM journal_categories ORDER BY nom_categorie ASC');
     $categories = $catStmt->fetchAll();
@@ -198,7 +241,8 @@ if (is_array($article)) {
                         <h3 class="related-title">Autres articles</h3>
                         <div class="related-grid">
                             <?php foreach ($relatedArticles as $related): ?>
-                                <a href="/Iran/article/<?= (int) $related['id'] ?>.html" class="related-card">
+                                <?php $relatedUrl = build_public_article_url($related); ?>
+                                <a href="<?= htmlspecialchars($relatedUrl, ENT_QUOTES, 'UTF-8') ?>" class="related-card">
                                     <img src="<?= htmlspecialchars((string) $related['first_image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string) ($related['titre'] ?? 'Article'), ENT_QUOTES, 'UTF-8') ?>" class="related-thumb" loading="lazy" decoding="async" width="300" height="130">
                                     <div class="related-body">
                                         <p class="related-date"><?= htmlspecialchars((string) ($related['date'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>

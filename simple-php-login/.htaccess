@@ -6,6 +6,7 @@ RewriteRule ^$ /admin/login [R=302,L]
 
 RewriteRule ^Iran/actualites\.html$ pages/actualites-FO.php [QSA,L]
 RewriteRule ^Iran/article/([0-9]+)\.html$ pages/article-FO.php?id=$1 [QSA,L]
+RewriteRule ^Iran/article/([^/]+)\.html$ pages/article-FO.php?slug=$1 [QSA,L,NC]
 
 RewriteRule ^admin/?$ pages/index.php [QSA,L]
 RewriteRule ^admin/login/?$ pages/login.php [QSA,L]
@@ -14,6 +15,7 @@ RewriteRule ^admin/create/?$ pages/create.php [QSA,L]
 RewriteRule ^admin/edit/([0-9]+)/?$ pages/edit.php?id=$1 [QSA,L]
 RewriteRule ^admin/delete/([0-9]+)/?$ pages/delete.php?id=$1 [QSA,L]
 RewriteRule ^admin/article/([0-9]+)/?$ pages/article.php?id=$1 [QSA,L]
+RewriteRule ^admin/article/([^/]+)/?$ pages/article.php?slug=$1 [QSA,L,NC]
 
 <IfModule mod_expires.c>
     ExpiresActive On

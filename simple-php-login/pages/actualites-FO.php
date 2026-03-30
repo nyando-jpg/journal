@@ -44,6 +44,31 @@ function normalize_front_image_src(string $src): string
     return $src;
 }
 
+function slugify_public_title(string $title): string
+{
+    $slug = trim($title);
+    if ($slug === '') {
+        return 'article';
+    }
+
+    $transliterated = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $slug);
+    if ($transliterated !== false) {
+        $slug = $transliterated;
+    }
+
+    $slug = strtolower($slug);
+    $slug = preg_replace('/[^a-z0-9]+/', '-', $slug) ?? '';
+    $slug = trim($slug, '-');
+
+    return $slug !== '' ? $slug : 'article';
+}
+
+function build_public_article_url(array $article): string
+{
+    $title = (string) ($article['titre'] ?? 'article');
+    return '/Iran/article/' . rawurlencode(slugify_public_title($title)) . '.html';
+}
+
 try {
     $pdo = db_connect();
 
@@ -227,14 +252,15 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
                         <h3 class="side-title">Articles avec image</h3>
                         <div class="articles-with-image">
                             <?php foreach ($pagedArticlesWithImage as $article): ?>
-                                <article class="article-card" onclick="window.location.href='/Iran/article/<?= (int) $article['id'] ?>.html'">
+                                <?php $articleUrl = build_public_article_url($article); ?>
+                                <article class="article-card" onclick="window.location.href='<?= htmlspecialchars($articleUrl, ENT_QUOTES, 'UTF-8') ?>'">
                                     <img src="<?= htmlspecialchars((string) $article['first_image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?>" class="article-thumb" loading="lazy" decoding="async" width="400" height="180">
                                     <h2 class="article-title"><?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?></h2>
                                     <p class="article-meta"><strong>Date:</strong> <?= htmlspecialchars((string) $article['date'], ENT_QUOTES, 'UTF-8') ?></p>
                                     <p class="article-meta"><strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe'), ENT_QUOTES, 'UTF-8') ?></p>
                                     <p class="article-meta"><strong>Auteur:</strong> <?= htmlspecialchars((string) ($article['admin_nom'] ?? ('Admin #' . $article['id_admin'])), ENT_QUOTES, 'UTF-8') ?></p>
                                     <p class="content-preview"><?= htmlspecialchars(mb_substr(strip_tags((string) $article['details']), 0, 160), ENT_QUOTES, 'UTF-8') ?>...</p>
-                                    <a href="/Iran/article/<?= (int) $article['id'] ?>.html" class="card-read" onclick="event.stopPropagation()">Lire la suite</a>
+                                    <a href="<?= htmlspecialchars($articleUrl, ENT_QUOTES, 'UTF-8') ?>" class="card-read" onclick="event.stopPropagation()">Lire la suite</a>
                                 </article>
                             <?php endforeach; ?>
                         </div>
@@ -289,13 +315,14 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
                         <h3 class="side-title">Articles sans image</h3>
                         <div class="articles-without-image">
                             <?php foreach ($pagedArticlesWithoutImage as $article): ?>
-                                <article class="article-card no-image" onclick="window.location.href='/Iran/article/<?= (int) $article['id'] ?>.html'">
+                                <?php $articleUrl = build_public_article_url($article); ?>
+                                <article class="article-card no-image" onclick="window.location.href='<?= htmlspecialchars($articleUrl, ENT_QUOTES, 'UTF-8') ?>'">
                                     <h2 class="article-title"><?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?></h2>
                                     <p class="article-meta"><strong>Date:</strong> <?= htmlspecialchars((string) $article['date'], ENT_QUOTES, 'UTF-8') ?></p>
                                     <p class="article-meta"><strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe'), ENT_QUOTES, 'UTF-8') ?></p>
                                     <p class="article-meta"><strong>Auteur:</strong> <?= htmlspecialchars((string) ($article['admin_nom'] ?? ('Admin #' . $article['id_admin'])), ENT_QUOTES, 'UTF-8') ?></p>
                                     <p class="content-preview"><?= htmlspecialchars(mb_substr(strip_tags((string) $article['details']), 0, 160), ENT_QUOTES, 'UTF-8') ?>...</p>
-                                    <a href="/Iran/article/<?= (int) $article['id'] ?>.html" class="card-read" onclick="event.stopPropagation()">Lire la suite</a>
+                                    <a href="<?= htmlspecialchars($articleUrl, ENT_QUOTES, 'UTF-8') ?>" class="card-read" onclick="event.stopPropagation()">Lire la suite</a>
                                 </article>
                             <?php endforeach; ?>
                         </div>
