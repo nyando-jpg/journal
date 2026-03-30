@@ -74,4 +74,4 @@ if (!move_uploaded_file($tmpName, $targetPath)) {
     exit;
 }
 
-echo json_encode(['location' => '/simple-php-login/uploads/' . $fileName]);
+echo json_encode(['location' => '/uploads/' . $fileName]);

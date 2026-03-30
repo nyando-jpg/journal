@@ -6,7 +6,7 @@ session_start();
 
 if (!isset($_SESSION['user_id'], $_SESSION['user_name'], $_SESSION['is_admin'])) {
     session_unset();
-    header('Location: login.php');
+    header('Location: /admin/login');
     exit;
 }
 
@@ -73,23 +73,21 @@ function normalize_image_src_for_simple_php(string $src): string
         return '';
     }
 
+    // Nettoyer les chemins vers /uploads/
     if (strpos($src, '/simple-php-login/uploads/') === 0) {
-        return $src;
+        return str_replace('/simple-php-login/uploads/', '/uploads/', $src);
     }
     if (strpos($src, '../../uploads/') === 0) {
-        return str_replace('../../uploads/', '/simple-php-login/uploads/', $src);
+        return str_replace('../../uploads/', '/uploads/', $src);
     }
     if (strpos($src, '../uploads/') === 0) {
-        return str_replace('../uploads/', '/simple-php-login/uploads/', $src);
+        return str_replace('../uploads/', '/uploads/', $src);
     }
     if (strpos($src, './uploads/') === 0) {
-        return str_replace('./uploads/', '/simple-php-login/uploads/', $src);
-    }
-    if (strpos($src, '/uploads/') === 0) {
-        return str_replace('/uploads/', '/simple-php-login/uploads/', $src);
+        return str_replace('./uploads/', '/uploads/', $src);
     }
     if (strpos($src, 'uploads/') === 0) {
-        return '/simple-php-login/' . $src;
+        return '/' . $src;
     }
 
     return $src;
@@ -407,24 +405,24 @@ foreach ($articles as $article) {
                 <span>Espace Administration</span>
                 <span>
                     Gestion des contenus et editeurs
-                    <a class="logout-link" href="logout.php">Deconnexion</a>
+                    <a class="logout-link" href="/admin/logout">Deconnexion</a>
                 </span>
             </div>
         </div>
 
         <div class="header-main-inner">
             <div>
-                <a href="index.php?q=&category=0" class="brand-link">Journal d'Information</a>
+                <a href="/admin" class="brand-link">Journal d'Information</a>
                 <p class="brand-tagline">Espace d'administration</p>
             </div>
             <div class="header-actions">
-                <a href="index.php?q=&category=0" class="header-chip">Tous les articles</a>
-                <a href="create.php" class="header-chip header-chip-primary">+ Nouvel Article</a>
+                <a href="/admin" class="header-chip">Tous les articles</a>
+                <a href="/admin/create" class="header-chip header-chip-primary">+ Nouvel Article</a>
             </div>
             <div class="header-categories">
                 <?php foreach ($categories as $headerCategory): ?>
                     <a
-                        href="index.php?q=<?= urlencode($search) ?>&category=<?= (int) $headerCategory['id_categorie'] ?>"
+                        href="/admin?q=<?= urlencode($search) ?>&category=<?= (int) $headerCategory['id_categorie'] ?>"
                         class="category-link <?= $selectedCategoryId === (int) $headerCategory['id_categorie'] ? 'active' : '' ?>"
                     >
                         <?= htmlspecialchars((string) $headerCategory['nom_categorie'], ENT_QUOTES, 'UTF-8') ?>
@@ -465,7 +463,7 @@ foreach ($articles as $article) {
             <div class="alert alert-danger"><?= htmlspecialchars($dbError, ENT_QUOTES, 'UTF-8') ?></div>
         <?php endif; ?>
 
-        <form action="index.php" method="GET" class="search-bar">
+        <form action="/admin" method="GET" class="search-bar">
             <input
                 type="text"
                 name="q"
@@ -483,7 +481,7 @@ foreach ($articles as $article) {
             </select>
             <button type="submit" class="btn btn-primary">Rechercher</button>
             <?php if ($search !== '' || $selectedCategoryId > 0): ?>
-                <a href="index.php?q=&category=0" class="btn">Effacer</a>
+                <a href="/admin" class="btn">Effacer</a>
             <?php endif; ?>
         </form>
 
@@ -499,7 +497,7 @@ foreach ($articles as $article) {
                     <h3 class="side-title">Articles avec image</h3>
                     <div class="articles-with-image">
                         <?php foreach ($articlesWithImage as $article): ?>
-                            <article class="article-card" onclick="window.location.href='article.php?id=<?= (int) $article['id'] ?>'">
+                            <article class="article-card" onclick="window.location.href='/admin/article/<?= (int) $article['id'] ?>'">
                                 <img src="<?= htmlspecialchars((string) $article['first_image'], ENT_QUOTES, 'UTF-8') ?>" alt="Apercu image de l'article" class="article-thumb">
 
                                 <h2 class="article-title"><?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?></h2>
@@ -511,11 +509,11 @@ foreach ($articles as $article) {
                                 </p>
 
                                 <div class="card-actions" onclick="event.stopPropagation()">
-                                    <a href="edit.php?id=<?= (int) $article['id'] ?>" class="btn btn-warning btn-icon" title="Modifier" aria-label="Modifier">
+                                    <a href="/admin/edit/<?= (int) $article['id'] ?>" class="btn btn-warning btn-icon" title="Modifier" aria-label="Modifier">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm18.71-11.04a1.004 1.004 0 0 0 0-1.42l-2.5-2.5a1.004 1.004 0 0 0-1.42 0L15.13 4.95l3.75 3.75 2.83-2.49z"/></svg>
                                         <span class="sr-only">Modifier</span>
                                     </a>
-                                    <a href="delete.php?id=<?= (int) $article['id'] ?>" class="btn btn-danger btn-icon" title="Supprimer" aria-label="Supprimer" onclick="return confirm('Etes-vous sur de vouloir supprimer cet article ?')">
+                                    <a href="/admin/delete/<?= (int) $article['id'] ?>" class="btn btn-danger btn-icon" title="Supprimer" aria-label="Supprimer" onclick="return confirm('Etes-vous sur de vouloir supprimer cet article ?')">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 2h4v2H4V6h4l1-2z"/></svg>
                                         <span class="sr-only">Supprimer</span>
                                     </a>
@@ -529,7 +527,7 @@ foreach ($articles as $article) {
                     <h3 class="side-title">Articles sans image</h3>
                     <div class="articles-without-image">
                         <?php foreach ($articlesWithoutImage as $article): ?>
-                            <article class="article-card no-image" onclick="window.location.href='article.php?id=<?= (int) $article['id'] ?>'">
+                            <article class="article-card no-image" onclick="window.location.href='/admin/article/<?= (int) $article['id'] ?>'">
                                 <h2 class="article-title"><?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?></h2>
                                 <p class="article-meta"><strong>Date:</strong> <?= htmlspecialchars((string) $article['date'], ENT_QUOTES, 'UTF-8') ?></p>
                                 <p class="article-meta"><strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe'), ENT_QUOTES, 'UTF-8') ?></p>
@@ -539,11 +537,11 @@ foreach ($articles as $article) {
                                 </p>
 
                                 <div class="card-actions" onclick="event.stopPropagation()">
-                                    <a href="edit.php?id=<?= (int) $article['id'] ?>" class="btn btn-warning btn-icon" title="Modifier" aria-label="Modifier">
+                                    <a href="/admin/edit/<?= (int) $article['id'] ?>" class="btn btn-warning btn-icon" title="Modifier" aria-label="Modifier">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm18.71-11.04a1.004 1.004 0 0 0 0-1.42l-2.5-2.5a1.004 1.004 0 0 0-1.42 0L15.13 4.95l3.75 3.75 2.83-2.49z"/></svg>
                                         <span class="sr-only">Modifier</span>
                                     </a>
-                                    <a href="delete.php?id=<?= (int) $article['id'] ?>" class="btn btn-danger btn-icon" title="Supprimer" aria-label="Supprimer" onclick="return confirm('Etes-vous sur de vouloir supprimer cet article ?')">
+                                    <a href="/admin/delete/<?= (int) $article['id'] ?>" class="btn btn-danger btn-icon" title="Supprimer" aria-label="Supprimer" onclick="return confirm('Etes-vous sur de vouloir supprimer cet article ?')">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 2h4v2H4V6h4l1-2z"/></svg>
                                         <span class="sr-only">Supprimer</span>
                                     </a>

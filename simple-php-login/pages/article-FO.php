@@ -6,7 +6,7 @@ require __DIR__ . '/../config/db.php';
 
 $articleId = max(0, (int) ($_GET['id'] ?? 0));
 if ($articleId <= 0) {
-    header('Location: actualites-FO.php?error=notfound');
+    header('Location: /Iran/actualites.html?error=notfound');
     exit;
 }
 
@@ -22,23 +22,26 @@ function normalize_front_image_src_detail(string $src): string
         return '';
     }
 
-    if (strpos($src, '/simple-php-login/uploads/') === 0) {
+    // Already a correct absolute path
+    if (strpos($src, '/uploads/') === 0) {
         return $src;
     }
+    // Legacy path with /simple-php-login/ prefix - remove it
+    if (strpos($src, '/simple-php-login/uploads/') === 0) {
+        return str_replace('/simple-php-login/uploads/', '/uploads/', $src);
+    }
+    // Relative paths - convert to absolute /uploads/
     if (strpos($src, '../../uploads/') === 0) {
-        return str_replace('../../uploads/', '/simple-php-login/uploads/', $src);
+        return str_replace('../../uploads/', '/uploads/', $src);
     }
     if (strpos($src, '../uploads/') === 0) {
-        return str_replace('../uploads/', '/simple-php-login/uploads/', $src);
+        return str_replace('../uploads/', '/uploads/', $src);
     }
     if (strpos($src, './uploads/') === 0) {
-        return str_replace('./uploads/', '/simple-php-login/uploads/', $src);
-    }
-    if (strpos($src, '/uploads/') === 0) {
-        return str_replace('/uploads/', '/simple-php-login/uploads/', $src);
+        return str_replace('./uploads/', '/uploads/', $src);
     }
     if (strpos($src, 'uploads/') === 0) {
-        return '/simple-php-login/' . $src;
+        return '/' . $src;
     }
 
     return $src;
@@ -69,7 +72,7 @@ try {
     $article = $stmt->fetch();
 
     if (!$article) {
-        header('Location: actualites-FO.php?error=notfound');
+        header('Location: /Iran/actualites.html?error=notfound');
         exit;
     }
 
@@ -82,7 +85,7 @@ try {
     foreach ($relatedRows as $row) {
         $img = extract_first_image_from_details_front((string) ($row['details'] ?? ''));
         if ($img === '') {
-            $img = '/simple-php-login/uploads/image.png';
+            $img = '/uploads/image.png';
         }
         $row['first_image'] = $img;
         $relatedArticles[] = $row;
@@ -126,6 +129,7 @@ if (is_array($article)) {
         .category-link:hover { color: #60a5fa; }
         main { width: 90%; max-width: 1200px; margin: 20px auto; padding: 0; }
         .article-container { background: white; border-radius: 8px; padding: 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .article-title { font-size: 2rem; color: #1f2937; margin-bottom: 20px; font-family: "Playfair Display", "Times New Roman", serif; line-height: 1.3; }
         .article-meta { color: #666; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
         .article-content { font-size: 1.1rem; }
         .article-content p:first-of-type::first-letter { float: left; font-family: "Playfair Display", "Times New Roman", serif; font-size: 4.4em; line-height: 0.82; margin: 0.03em 0.14em 0 0; font-weight: 700; color: #0f172a; text-transform: uppercase; }
@@ -161,12 +165,12 @@ if (is_array($article)) {
         </div>
         <div class="header-main-inner">
             <div>
-                <a href="actualites-FO.php" class="brand-link">Journal d'Information</a>
+                <a href="/Iran/actualites.html" class="brand-link">Journal d'Information</a>
                 <p class="brand-tagline">Analyses, terrain et decryptage geopolitique</p>
             </div>
             <div class="header-categories">
                 <?php foreach ($categories as $headerCategory): ?>
-                    <a href="actualites-FO.php?category=<?= (int) $headerCategory['id_categorie'] ?>" class="category-link">
+                    <a href="/Iran/actualites.html?category=<?= (int) $headerCategory['id_categorie'] ?>" class="category-link">
                         <?= htmlspecialchars((string) $headerCategory['nom_categorie'], ENT_QUOTES, 'UTF-8') ?>
                     </a>
                 <?php endforeach; ?>
@@ -181,6 +185,7 @@ if (is_array($article)) {
 
         <?php if ($article): ?>
             <article class="article-container">
+                <h1 class="article-title"><?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?></h1>
                 <div class="article-meta">
                     <p><strong>Date:</strong> <?= htmlspecialchars((string) $article['date'], ENT_QUOTES, 'UTF-8') ?> | <strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe'), ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
@@ -193,8 +198,8 @@ if (is_array($article)) {
                         <h3 class="related-title">Autres articles</h3>
                         <div class="related-grid">
                             <?php foreach ($relatedArticles as $related): ?>
-                                <a href="article-FO.php?id=<?= (int) $related['id'] ?>" class="related-card">
-                                    <img src="<?= htmlspecialchars((string) $related['first_image'], ENT_QUOTES, 'UTF-8') ?>" alt="Apercu article" class="related-thumb">
+                                <a href="/Iran/article/<?= (int) $related['id'] ?>.html" class="related-card">
+                                    <img src="<?= htmlspecialchars((string) $related['first_image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string) ($related['titre'] ?? 'Article'), ENT_QUOTES, 'UTF-8') ?>" class="related-thumb">
                                     <div class="related-body">
                                         <p class="related-date"><?= htmlspecialchars((string) ($related['date'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
                                         <p class="related-name"><?= htmlspecialchars((string) ($related['titre'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
@@ -205,7 +210,7 @@ if (is_array($article)) {
                     </section>
                 <?php endif; ?>
 
-                <a href="actualites-FO.php" class="back-link">Retour aux actualites</a>
+                <a href="/Iran/actualites.html" class="back-link">Retour aux actualites</a>
             </article>
         <?php endif; ?>
     </main>
@@ -220,7 +225,7 @@ if (is_array($article)) {
                 <h3 class="footer-title">Categories</h3>
                 <ul class="footer-list">
                     <?php foreach (array_slice($categories, 0, 5) as $cat): ?>
-                        <li><a href="actualites-FO.php?category=<?= (int) $cat['id_categorie'] ?>"><?= htmlspecialchars((string) $cat['nom_categorie'], ENT_QUOTES, 'UTF-8') ?></a></li>
+                        <li><a href="/Iran/actualites.html?category=<?= (int) $cat['id_categorie'] ?>"><?= htmlspecialchars((string) $cat['nom_categorie'], ENT_QUOTES, 'UTF-8') ?></a></li>
                     <?php endforeach; ?>
                 </ul>
             </div>
