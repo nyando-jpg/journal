@@ -13,7 +13,7 @@
             height: 100vh;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: "Merriweather", Georgia, serif;
         }
         .container {
             text-align: center;
