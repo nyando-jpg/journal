@@ -161,9 +161,7 @@
                 <div class="articles-grid">
                     <?php foreach ($articles as $article): ?>
                         <?php
-                        // Extraire le titre (premier h1, h2 ou premiers mots)
-                        preg_match('/<h[1-6][^>]*>(.*?)<\/h[1-6]>/i', $article['details'], $matches);
-                        $title = isset($matches[1]) ? strip_tags($matches[1]) : mb_substr(strip_tags($article['details']), 0, 50) . '...';
+                        $title = $article['titre'] ?? mb_substr(strip_tags($article['details']), 0, 50) . '...';
 
                         // Extraire un extrait
                         $excerpt = mb_substr(strip_tags($article['details']), 0, 150) . '...';

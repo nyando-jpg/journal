@@ -23,7 +23,7 @@ WORKDIR /var/www
 COPY . .
 
 # Installer les dépendances PHP avec Composer
-RUN composer install --no-dev --optimize-autoloader
+RUN composer update --no-dev --optimize-autoloader
 
 # Crédits des permissions pour Apache
 RUN chown -R www-data:www-data /var/www && \

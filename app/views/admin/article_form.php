@@ -51,13 +51,24 @@
     <div class="container">
         <h1><?= $article ? 'Modifier l\'article #' . htmlspecialchars($article['id']) : 'Créer un nouvel article' ?></h1>
 
-        <?php if (isset($_GET['error'])): ?>
+        <?php if (isset($_GET['error']) && $_GET['error'] === '1'): ?>
             <div class="alert alert-danger">
-                Le contenu de l'article ne peut pas être vide.
+                Le titre et le contenu de l'article sont obligatoires.
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'local_image'): ?>
+            <div class="alert alert-danger">
+                Une image utilise un chemin local (ex: C:\...). Utilisez le bouton image de l'editeur pour uploader vers /uploads.
             </div>
         <?php endif; ?>
 
         <form action="<?= htmlspecialchars($action) ?>" method="POST">
+            <div class="form-group">
+                <label for="titre">Titre</label>
+                <input type="text" id="titre" name="titre" value="<?= $article ? htmlspecialchars($article['titre']) : '' ?>" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;" required>
+            </div>
+
             <div class="form-group">
                 <label for="details">Contenu de l'article</label>
                 <textarea id="details" name="details"><?= $article ? htmlspecialchars($article['details']) : '' ?></textarea>
@@ -76,6 +87,8 @@
         tinymce.init({
             selector: '#details',
             height: 500,
+            relative_urls: false,
+            document_base_url: '/',
             plugins: [
                 'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                 'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
@@ -84,7 +97,55 @@
             toolbar: 'undo redo | blocks | ' +
                 'bold italic backcolor | alignleft aligncenter ' +
                 'alignright alignjustify | bullist numlist outdent indent | ' +
-                'removeformat | help',
+                'removeformat | image | help',
+            images_upload_url: '/admin/articles/upload-image',
+            automatic_uploads: true,
+            images_file_types: 'jpg,jpeg,png,gif,webp',
+            file_picker_types: 'image',
+            file_picker_callback: function (callback, value, meta) {
+                if (meta.filetype !== 'image') {
+                    return;
+                }
+
+                const input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', 'image/*');
+
+                input.addEventListener('change', function () {
+                    const file = this.files && this.files[0] ? this.files[0] : null;
+                    if (!file) {
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    fetch('/admin/articles/upload-image', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'same-origin'
+                    })
+                        .then(function (response) {
+                            if (!response.ok) {
+                                return response.json().then(function (data) {
+                                    throw new Error(data.error || 'Upload failed');
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(function (data) {
+                            if (!data.location) {
+                                throw new Error('Invalid upload response');
+                            }
+                            callback(data.location, { alt: file.name });
+                        })
+                        .catch(function (error) {
+                            alert('Erreur upload image: ' + error.message);
+                        });
+                });
+
+                input.click();
+            },
             content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 16px; }'
         });
     </script>

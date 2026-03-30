@@ -26,6 +26,8 @@ $router->get('/pageAdmin', [$UserController, 'pageAdmin']);
 $router->get('/admin/articles', [$ArticleController, 'index']);
 $router->get('/admin/articles/create', [$ArticleController, 'create']);
 $router->post('/admin/articles/store', [$ArticleController, 'store']);
+$router->post('/admin/articles/upload-image', [$ArticleController, 'uploadImage']);
+$router->get('/admin/articles/view/@id', [$ArticleController, 'adminShow']);
 $router->get('/admin/articles/edit/@id', [$ArticleController, 'edit']);
 $router->post('/admin/articles/update/@id', [$ArticleController, 'update']);
 $router->get('/admin/articles/delete/@id', [$ArticleController, 'delete']);
