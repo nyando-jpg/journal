@@ -1,3 +1,5 @@
+
+@@ -1,11 +0,0 @@
 docker compose down
 docker compose up -d
 
