@@ -1,3 +1,47 @@
+<?php
+
+declare(strict_types=1);
+
+session_start();
+
+if (isset($_SESSION['user_id'], $_SESSION['user_name'], $_SESSION['is_admin'])) {
+    header('Location: index.php');
+    exit;
+}
+
+require __DIR__ . '/../config/db.php';
+
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = trim($_POST['name'] ?? '');
+    $password = trim($_POST['password'] ?? '');
+
+    if ($name === '' || $password === '') {
+        $error = 'Veuillez remplir tous les champs.';
+    } else {
+        try {
+            $pdo = db_connect();
+            $stmt = $pdo->prepare('SELECT id_user, nom, mdp, is_admin FROM journal_user WHERE nom = :nom LIMIT 1');
+            $stmt->execute(['nom' => $name]);
+            $user = $stmt->fetch();
+
+            if ($user && (string) $user['mdp'] === $password) {
+                $_SESSION['user_id'] = (int) $user['id_user'];
+                $_SESSION['user_name'] = (string) $user['nom'];
+                $_SESSION['is_admin'] = (int) $user['is_admin'] === 1;
+
+                header('Location: index.php');
+                exit;
+            }
+
+            $error = 'Identifiants invalides.';
+        } catch (Throwable $e) {
+            $error = 'Erreur de connexion a la base de donnees.';
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -14,7 +58,6 @@
             min-height: 100vh;
         }
 
-        /* Header */
         .site-header { background-color: #0f172a; color: #f8fafc; }
         .header-top {
             background: #0b1220;
@@ -40,7 +83,6 @@
         }
         .brand-tagline { font-size: 0.88rem; color: #94a3b8; margin-top: 3px; }
 
-        /* Login body */
         .login-body {
             flex: 1;
             display: flex;
@@ -136,7 +178,6 @@
             color: #94a3b8;
         }
 
-        /* Footer */
         footer {
             background: #121629;
             color: #94a3b8;
@@ -151,28 +192,28 @@
 
     <header class="site-header">
         <div class="header-top">
-            <span>Édition du <?= date('d/m/Y') ?> — Mise à jour continue</span>
-            <span>Contact rédaction : redaction@journalinfo.fr</span>
+            <span>Edition du <?= date('d/m/Y') ?> - Mise a jour continue</span>
+            <span>Contact redaction : redaction@journalinfo.fr</span>
         </div>
         <div class="header-main">
-            <a href="/actualites" class="brand-name">Journal d'Information</a>
-            <p class="brand-tagline">Analyses, terrain et décryptage géopolitique</p>
+            <a href="login.php" class="brand-name">Journal d'Information</a>
+            <p class="brand-tagline">Analyses, terrain et decryptage geopolitique</p>
         </div>
     </header>
 
     <div class="login-body">
         <div class="login-card">
             <span class="login-badge">Administration</span>
-            <h1 class="login-title">Connexion à la rédaction</h1>
-            <p class="login-subtitle">Accès réservé aux membres de l'équipe éditoriale.</p>
+            <h1 class="login-title">Connexion a la redaction</h1>
+            <p class="login-subtitle">Acces reserve aux membres de l'equipe editoriale.</p>
 
-            <?php if (isset($_GET['error'])): ?>
+            <?php if ($error !== ''): ?>
                 <div class="error-msg">
-                    <?= htmlspecialchars($_GET['error']) ?>
+                    <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
                 </div>
             <?php endif; ?>
 
-            <form action="login_admin" method="POST">
+            <form action="login.php" method="POST">
                 <div class="form-group">
                     <label class="form-label" for="name">Nom d'utilisateur</label>
                     <input type="text" name="name" id="name" class="form-input"
@@ -182,7 +223,7 @@
                 <div class="form-group">
                     <label class="form-label" for="password">Mot de passe</label>
                     <input type="password" name="password" id="password" class="form-input"
-                           value="adminpass" placeholder="••••••••" required>
+                           value="adminpass" placeholder="********" required>
                 </div>
 
                 <div class="form-divider"></div>
@@ -190,12 +231,12 @@
                 <button type="submit" class="btn-login">Se connecter</button>
             </form>
 
-            <p class="login-footer-note">Accès sécurisé — Journaux d'accès activés</p>
+            <p class="login-footer-note">Acces securise - Journaux d'acces actives</p>
         </div>
     </div>
 
     <footer>
-        &copy; <?= date('Y') ?> Journal d'Information. Tous droits réservés. &nbsp;|&nbsp; Mentions légales
+        &copy; <?= date('Y') ?> Journal d'Information. Tous droits reserves. &nbsp;|&nbsp; Mentions legales
     </footer>
 
 </body>

@@ -14,13 +14,13 @@ $userModel = Flight::UserModel();
 $UserController = new UserController($userModel);
 
 $articleModel = Flight::ArticleModel();
-$ArticleController = new ArticleController($articleModel);
+$categoryModel = Flight::CategoryModel();
+$ArticleController = new ArticleController($articleModel, $categoryModel);
 
 // Routes principales
 $router->get('/', [$UserController, 'logPageAdmin']);
 $router->get('/loginAdmin', [$UserController, 'logPageAdmin']);
 $router->post('/login_admin', [$UserController, 'loginUser']);
-$router->get('/pageAdmin', [$UserController, 'pageAdmin']);
 
 // Routes CRUD Articles (BackOffice)
 $router->get('/admin/articles', [$ArticleController, 'index']);

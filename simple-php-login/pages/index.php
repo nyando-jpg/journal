@@ -1,10 +1,120 @@
+<?php
+
+declare(strict_types=1);
+
+session_start();
+
+if (!isset($_SESSION['user_id'], $_SESSION['user_name'], $_SESSION['is_admin'])) {
+    session_unset();
+    header('Location: login.php');
+    exit;
+}
+
+require __DIR__ . '/../config/db.php';
+
+$search = trim((string) ($_GET['q'] ?? ''));
+$selectedCategoryId = max(0, (int) ($_GET['category'] ?? 0));
+
+$categories = [];
+$articles = [];
+$dbError = '';
+
+try {
+    $pdo = db_connect();
+
+    $catStmt = $pdo->query('SELECT id_categorie, nom_categorie FROM journal_categories ORDER BY nom_categorie ASC');
+    $categories = $catStmt->fetchAll();
+
+    $sql = 'SELECT ji.*, ju.nom AS admin_nom, jc.nom_categorie
+            FROM journal_info ji
+            LEFT JOIN journal_user ju ON ji.id_admin = ju.id_user
+            LEFT JOIN journal_categories jc ON ji.id_categorie = jc.id_categorie';
+
+    $where = [];
+    $params = [];
+
+    if ($search !== '') {
+        $where[] = '(ji.titre LIKE :search OR ji.details LIKE :search OR ju.nom LIKE :search OR jc.nom_categorie LIKE :search OR ji.date LIKE :search OR CAST(ji.id AS CHAR) LIKE :search)';
+        $params['search'] = '%' . $search . '%';
+    }
+
+    if ($selectedCategoryId > 0) {
+        $where[] = 'ji.id_categorie = :categoryId';
+        $params['categoryId'] = $selectedCategoryId;
+    }
+
+    if (!empty($where)) {
+        $sql .= ' WHERE ' . implode(' AND ', $where);
+    }
+
+    $sql .= ' ORDER BY ji.date DESC';
+
+    $stmt = $pdo->prepare($sql);
+    if (isset($params['search'])) {
+        $stmt->bindValue(':search', $params['search']);
+    }
+    if (isset($params['categoryId'])) {
+        $stmt->bindValue(':categoryId', (int) $params['categoryId'], PDO::PARAM_INT);
+    }
+
+    $stmt->execute();
+    $articles = $stmt->fetchAll();
+} catch (Throwable $e) {
+    $dbError = 'Erreur de connexion a la base de donnees.';
+}
+
+$articlesWithImage = [];
+$articlesWithoutImage = [];
+
+function normalize_image_src_for_simple_php(string $src): string
+{
+    $src = trim($src);
+    if ($src === '') {
+        return '';
+    }
+
+    if (strpos($src, '/simple-php-login/uploads/') === 0) {
+        return $src;
+    }
+    if (strpos($src, '../../uploads/') === 0) {
+        return str_replace('../../uploads/', '/simple-php-login/uploads/', $src);
+    }
+    if (strpos($src, '../uploads/') === 0) {
+        return str_replace('../uploads/', '/simple-php-login/uploads/', $src);
+    }
+    if (strpos($src, './uploads/') === 0) {
+        return str_replace('./uploads/', '/simple-php-login/uploads/', $src);
+    }
+    if (strpos($src, '/uploads/') === 0) {
+        return str_replace('/uploads/', '/simple-php-login/uploads/', $src);
+    }
+    if (strpos($src, 'uploads/') === 0) {
+        return '/simple-php-login/' . $src;
+    }
+
+    return $src;
+}
+
+foreach ($articles as $article) {
+    $firstImage = null;
+    if (preg_match('/<img[^>]+src=["\']([^"\']+)["\']/i', (string) ($article['details'] ?? ''), $match) === 1) {
+        $firstImage = normalize_image_src_for_simple_php((string) $match[1]);
+    }
+
+    if (!empty($firstImage)) {
+        $article['first_image'] = $firstImage;
+        $articlesWithImage[] = $article;
+    } else {
+        $articlesWithoutImage[] = $article;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Articles - Admin</title>
-    <link rel="stylesheet" href="/assets/css/styles.css">
     <style>
         * {
             margin: 0;
@@ -270,6 +380,10 @@
             background-color: #f8d7da;
             color: #721c24;
         }
+        .logout-link {
+            margin-left: 8px;
+            color: #cbd5e1;
+        }
         @media (max-width: 1100px) {
             .articles-layout {
                 grid-template-columns: 1fr;
@@ -291,26 +405,29 @@
         <div class="header-top">
             <div class="header-top-inner">
                 <span>Espace Administration</span>
-                <span>Gestion des contenus et editeurs</span>
+                <span>
+                    Gestion des contenus et editeurs
+                    <a class="logout-link" href="logout.php">Deconnexion</a>
+                </span>
             </div>
         </div>
 
         <div class="header-main-inner">
             <div>
-                <a href="/admin/articles?q=&category=0" class="brand-link">Journal d'Information</a>
+                <a href="index.php?q=&category=0" class="brand-link">Journal d'Information</a>
                 <p class="brand-tagline">Espace d'administration</p>
             </div>
             <div class="header-actions">
-                <a href="/admin/articles?q=&category=0" class="header-chip">Tous les articles</a>
-                <a href="/admin/articles/create" class="header-chip header-chip-primary">➕ Nouvel Article</a>
+                <a href="index.php?q=&category=0" class="header-chip">Tous les articles</a>
+                <a href="create.php" class="header-chip header-chip-primary">+ Nouvel Article</a>
             </div>
             <div class="header-categories">
-                <?php foreach (($categories ?? []) as $headerCategory): ?>
+                <?php foreach ($categories as $headerCategory): ?>
                     <a
-                        href="/admin/articles?q=<?= urlencode((string) ($search ?? '')) ?>&category=<?= (int) $headerCategory['id_categorie'] ?>"
-                        class="category-link <?= (int) ($selectedCategoryId ?? 0) === (int) $headerCategory['id_categorie'] ? 'active' : '' ?>"
+                        href="index.php?q=<?= urlencode($search) ?>&category=<?= (int) $headerCategory['id_categorie'] ?>"
+                        class="category-link <?= $selectedCategoryId === (int) $headerCategory['id_categorie'] ? 'active' : '' ?>"
                     >
-                        <?= htmlspecialchars((string) $headerCategory['nom_categorie']) ?>
+                        <?= htmlspecialchars((string) $headerCategory['nom_categorie'], ENT_QUOTES, 'UTF-8') ?>
                     </a>
                 <?php endforeach; ?>
             </div>
@@ -318,14 +435,12 @@
     </header>
 
     <main>
-                        <br><br><br><br><br><br><br>
-
         <h2 class="page-title">Gestion des Articles</h2>
 
         <?php if (isset($_GET['success'])): ?>
             <div class="alert alert-success">
                 <?php
-                switch ($_GET['success']) {
+                switch ((string) $_GET['success']) {
                     case 'created':
                         echo 'Article cree avec succes !';
                         break;
@@ -346,82 +461,61 @@
             </div>
         <?php endif; ?>
 
-        <form action="/admin/articles" method="GET" class="search-bar">
+        <?php if ($dbError !== ''): ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($dbError, ENT_QUOTES, 'UTF-8') ?></div>
+        <?php endif; ?>
+
+        <form action="index.php" method="GET" class="search-bar">
             <input
                 type="text"
                 name="q"
                 class="search-input"
                 placeholder="Rechercher par titre, contenu, auteur, date ou ID"
-                value="<?= htmlspecialchars((string) ($search ?? '')) ?>"
+                value="<?= htmlspecialchars($search, ENT_QUOTES, 'UTF-8') ?>"
             >
             <select name="category" class="search-input" style="max-width: 260px;">
                 <option value="0">Toutes les categories</option>
-                <?php foreach (($categories ?? []) as $category): ?>
-                    <option value="<?= (int) $category['id_categorie'] ?>" <?= (int) ($selectedCategoryId ?? 0) === (int) $category['id_categorie'] ? 'selected' : '' ?>>
-                        <?= htmlspecialchars((string) $category['nom_categorie']) ?>
+                <?php foreach ($categories as $category): ?>
+                    <option value="<?= (int) $category['id_categorie'] ?>" <?= $selectedCategoryId === (int) $category['id_categorie'] ? 'selected' : '' ?>>
+                        <?= htmlspecialchars((string) $category['nom_categorie'], ENT_QUOTES, 'UTF-8') ?>
                     </option>
                 <?php endforeach; ?>
             </select>
             <button type="submit" class="btn btn-primary">Rechercher</button>
-            <?php if (!empty($search) || (int) ($selectedCategoryId ?? 0) > 0): ?>
-                <a href="/admin/articles?q=&category=0" class="btn">Effacer</a>
+            <?php if ($search !== '' || $selectedCategoryId > 0): ?>
+                <a href="index.php?q=&category=0" class="btn">Effacer</a>
             <?php endif; ?>
         </form>
 
         <?php if (empty($articles)): ?>
-            <?php if (!empty($search)): ?>
-                <p>Aucun article trouve pour la recherche "<?= htmlspecialchars((string) $search) ?>".</p>
+            <?php if ($search !== ''): ?>
+                <p>Aucun article trouve pour la recherche "<?= htmlspecialchars($search, ENT_QUOTES, 'UTF-8') ?>".</p>
             <?php else: ?>
                 <p>Aucun article pour le moment.</p>
             <?php endif; ?>
         <?php else: ?>
-            <?php
-            $articlesWithImage = [];
-            $articlesWithoutImage = [];
-
-            foreach ($articles as $article) {
-                $firstImage = null;
-                if (preg_match('/<img[^>]+src=["\']([^"\']+)["\']/i', (string) ($article['details'] ?? ''), $match) === 1) {
-                    $firstImage = $match[1];
-                    if (strpos($firstImage, '../../uploads/') === 0) {
-                        $firstImage = str_replace('../../uploads/', '/uploads/', $firstImage);
-                    }
-                }
-
-                if (!empty($firstImage)) {
-                    $article['first_image'] = $firstImage;
-                    $articlesWithImage[] = $article;
-                } else {
-                    $articlesWithoutImage[] = $article;
-                }
-            }
-            ?>
             <div class="articles-layout">
                 <div>
                     <h3 class="side-title">Articles avec image</h3>
                     <div class="articles-with-image">
                         <?php foreach ($articlesWithImage as $article): ?>
-                            <article class="article-card" onclick="window.location.href='/admin/articles/view/<?= (int) $article['id'] ?>'">
-                                <img src="<?= htmlspecialchars((string) $article['first_image']) ?>" alt="Apercu image de l'article" class="article-thumb">
+                            <article class="article-card" onclick="window.location.href='article.php?id=<?= (int) $article['id'] ?>'">
+                                <img src="<?= htmlspecialchars((string) $article['first_image'], ENT_QUOTES, 'UTF-8') ?>" alt="Apercu image de l'article" class="article-thumb">
 
-                                <h2 class="article-title"><?= htmlspecialchars((string) $article['titre']) ?></h2>
-                                <p class="article-meta"><strong>Date:</strong> <?= htmlspecialchars((string) $article['date']) ?></p>
-                                <p class="article-meta"><strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe')) ?></p>
-                                <p class="article-meta"><strong>Auteur:</strong> <?= htmlspecialchars((string) ($article['nom_auteur'] ?? $article['admin_nom'] ?? ('Admin #' . $article['id_admin']))) ?></p>
+                                <h2 class="article-title"><?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?></h2>
+                                <p class="article-meta"><strong>Date:</strong> <?= htmlspecialchars((string) $article['date'], ENT_QUOTES, 'UTF-8') ?></p>
+                                <p class="article-meta"><strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe'), ENT_QUOTES, 'UTF-8') ?></p>
+                                <p class="article-meta"><strong>Auteur:</strong> <?= htmlspecialchars((string) ($article['admin_nom'] ?? ('Admin #' . $article['id_admin'])), ENT_QUOTES, 'UTF-8') ?></p>
                                 <p class="content-preview">
-                                    <?= mb_substr(strip_tags((string) $article['details']), 0, 160) ?>...
+                                    <?= htmlspecialchars(mb_substr(strip_tags((string) $article['details']), 0, 160), ENT_QUOTES, 'UTF-8') ?>...
                                 </p>
 
                                 <div class="card-actions" onclick="event.stopPropagation()">
-                                    <a href="/admin/articles/edit/<?= (int) $article['id'] ?>" class="btn btn-warning btn-icon" title="Modifier" aria-label="Modifier">
+                                    <a href="edit.php?id=<?= (int) $article['id'] ?>" class="btn btn-warning btn-icon" title="Modifier" aria-label="Modifier">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm18.71-11.04a1.004 1.004 0 0 0 0-1.42l-2.5-2.5a1.004 1.004 0 0 0-1.42 0L15.13 4.95l3.75 3.75 2.83-2.49z"/></svg>
                                         <span class="sr-only">Modifier</span>
                                     </a>
-                                    <a href="/admin/articles/delete/<?= (int) $article['id'] ?>"
-                                       class="btn btn-danger btn-icon"
-                                       title="Supprimer"
-                                       aria-label="Supprimer"
-                                       onclick="return confirm('Etes-vous sur de vouloir supprimer cet article ?')">
+                                    <a href="delete.php?id=<?= (int) $article['id'] ?>" class="btn btn-danger btn-icon" title="Supprimer" aria-label="Supprimer" onclick="return confirm('Etes-vous sur de vouloir supprimer cet article ?')">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 2h4v2H4V6h4l1-2z"/></svg>
                                         <span class="sr-only">Supprimer</span>
                                     </a>
@@ -435,25 +529,21 @@
                     <h3 class="side-title">Articles sans image</h3>
                     <div class="articles-without-image">
                         <?php foreach ($articlesWithoutImage as $article): ?>
-                            <article class="article-card no-image" onclick="window.location.href='/admin/articles/view/<?= (int) $article['id'] ?>'">
-                                <h2 class="article-title"><?= htmlspecialchars((string) $article['titre']) ?></h2>
-                                <p class="article-meta"><strong>Date:</strong> <?= htmlspecialchars((string) $article['date']) ?></p>
-                                <p class="article-meta"><strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe')) ?></p>
-                                <p class="article-meta"><strong>Auteur:</strong> <?= htmlspecialchars((string) ($article['nom_auteur'] ?? $article['admin_nom'] ?? ('Admin #' . $article['id_admin']))) ?></p>
+                            <article class="article-card no-image" onclick="window.location.href='article.php?id=<?= (int) $article['id'] ?>'">
+                                <h2 class="article-title"><?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?></h2>
+                                <p class="article-meta"><strong>Date:</strong> <?= htmlspecialchars((string) $article['date'], ENT_QUOTES, 'UTF-8') ?></p>
+                                <p class="article-meta"><strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe'), ENT_QUOTES, 'UTF-8') ?></p>
+                                <p class="article-meta"><strong>Auteur:</strong> <?= htmlspecialchars((string) ($article['admin_nom'] ?? ('Admin #' . $article['id_admin'])), ENT_QUOTES, 'UTF-8') ?></p>
                                 <p class="content-preview">
-                                    <?= mb_substr(strip_tags((string) $article['details']), 0, 160) ?>...
+                                    <?= htmlspecialchars(mb_substr(strip_tags((string) $article['details']), 0, 160), ENT_QUOTES, 'UTF-8') ?>...
                                 </p>
 
                                 <div class="card-actions" onclick="event.stopPropagation()">
-                                    <a href="/admin/articles/edit/<?= (int) $article['id'] ?>" class="btn btn-warning btn-icon" title="Modifier" aria-label="Modifier">
+                                    <a href="edit.php?id=<?= (int) $article['id'] ?>" class="btn btn-warning btn-icon" title="Modifier" aria-label="Modifier">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm18.71-11.04a1.004 1.004 0 0 0 0-1.42l-2.5-2.5a1.004 1.004 0 0 0-1.42 0L15.13 4.95l3.75 3.75 2.83-2.49z"/></svg>
                                         <span class="sr-only">Modifier</span>
                                     </a>
-                                    <a href="/admin/articles/delete/<?= (int) $article['id'] ?>"
-                                       class="btn btn-danger btn-icon"
-                                       title="Supprimer"
-                                       aria-label="Supprimer"
-                                       onclick="return confirm('Etes-vous sur de vouloir supprimer cet article ?')">
+                                    <a href="delete.php?id=<?= (int) $article['id'] ?>" class="btn btn-danger btn-icon" title="Supprimer" aria-label="Supprimer" onclick="return confirm('Etes-vous sur de vouloir supprimer cet article ?')">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 2h4v2H4V6h4l1-2z"/></svg>
                                         <span class="sr-only">Supprimer</span>
                                     </a>

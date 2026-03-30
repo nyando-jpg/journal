@@ -3,15 +3,18 @@
 namespace app\controllers;
 
 use app\models\ArticleModel;
+use app\models\CategoryModel;
 use Flight;
 
 class ArticleController
 {
     protected ArticleModel $articleModel;
+    protected CategoryModel $categoryModel;
 
-    public function __construct(ArticleModel $articleModel)
+    public function __construct(ArticleModel $articleModel, CategoryModel $categoryModel)
     {
         $this->articleModel = $articleModel;
+        $this->categoryModel = $categoryModel;
     }
 
     /**
@@ -20,11 +23,15 @@ class ArticleController
     public function index(): void
     {
         $search = trim((string) (Flight::request()->query->q ?? ''));
-        $articles = $this->articleModel->getAll($search === '' ? null : $search);
+        $selectedCategoryId = max(0, (int) (Flight::request()->query->category ?? 0));
+        $articles = $this->articleModel->getAll($search === '' ? null : $search, $selectedCategoryId > 0 ? $selectedCategoryId : null);
+        $categories = $this->categoryModel->getAll();
 
         Flight::render('admin/articles', [
             'articles' => $articles,
             'search' => $search,
+            'categories' => $categories,
+            'selectedCategoryId' => $selectedCategoryId,
         ]);
     }
 
@@ -40,7 +47,14 @@ class ArticleController
             return;
         }
 
-        Flight::render('admin/article_show', ['article' => $article]);
+        $categories = $this->categoryModel->getAll();
+
+        Flight::render('admin/article_show', [
+            'article' => $article,
+            'articleDetailsHtml' => $this->prepareArticleDetailsHtml((string) ($article['details'] ?? '')),
+            'relatedArticles' => $this->getRelatedArticlesWithImage($id, 3),
+            'categories' => $categories,
+        ]);
     }
 
     /**
@@ -48,8 +62,11 @@ class ArticleController
      */
     public function create(): void
     {
+        $categories = $this->categoryModel->getAll();
+
         Flight::render('admin/article_form', [
             'article' => null,
+            'categories' => $categories,
             'action' => '/admin/articles/store'
         ]);
     }
@@ -61,9 +78,15 @@ class ArticleController
     {
         $titre = trim((string) (Flight::request()->data->titre ?? ''));
         $details = Flight::request()->data->details ?? '';
+        $idCategorie = max(0, (int) (Flight::request()->data->id_categorie ?? 0));
 
-        if ($titre === '' || empty($details)) {
+        if ($titre === '' || empty($details) || $idCategorie <= 0) {
             Flight::redirect('/admin/articles/create?error=1');
+            return;
+        }
+
+        if (!$this->categoryModel->exists($idCategorie)) {
+            Flight::redirect('/admin/articles/create?error=category');
             return;
         }
 
@@ -74,7 +97,7 @@ class ArticleController
         }
 
         $idAdmin = (int) ($_SESSION['user_id'] ?? 1);
-        $this->articleModel->create($idAdmin, $titre, $details);
+        $this->articleModel->create($idAdmin, $idCategorie, $titre, $details);
         Flight::redirect('/admin/articles?success=created');
     }
 
@@ -90,8 +113,11 @@ class ArticleController
             return;
         }
 
+        $categories = $this->categoryModel->getAll();
+
         Flight::render('admin/article_form', [
             'article' => $article,
+            'categories' => $categories,
             'action' => '/admin/articles/update/' . $id
         ]);
     }
@@ -103,9 +129,15 @@ class ArticleController
     {
         $titre = trim((string) (Flight::request()->data->titre ?? ''));
         $details = Flight::request()->data->details ?? '';
+        $idCategorie = max(0, (int) (Flight::request()->data->id_categorie ?? 0));
 
-        if ($titre === '' || empty($details)) {
+        if ($titre === '' || empty($details) || $idCategorie <= 0) {
             Flight::redirect('/admin/articles/edit/' . $id . '?error=1');
+            return;
+        }
+
+        if (!$this->categoryModel->exists($idCategorie)) {
+            Flight::redirect('/admin/articles/edit/' . $id . '?error=category');
             return;
         }
 
@@ -116,7 +148,7 @@ class ArticleController
         }
 
         $idAdmin = (int) ($_SESSION['user_id'] ?? 1);
-        $this->articleModel->update($id, $idAdmin, $titre, $details);
+        $this->articleModel->update($id, $idAdmin, $idCategorie, $titre, $details);
         Flight::redirect('/admin/articles?success=updated');
     }
 
@@ -271,8 +303,19 @@ class ArticleController
      */
     public function home(): void
     {
-        $articles = $this->articleModel->getAll();
-        Flight::render('front/home', ['articles' => $articles]);
+        $search = trim((string) (Flight::request()->query->q ?? ''));
+        $selectedCategoryId = max(0, (int) (Flight::request()->query->category ?? 0));
+        $currentPage = max(1, (int) (Flight::request()->query->page ?? 1));
+        $articles = $this->articleModel->getAll($search === '' ? null : $search, $selectedCategoryId > 0 ? $selectedCategoryId : null);
+        $categories = $this->categoryModel->getAll();
+
+        Flight::render('front/home', [
+            'articles' => $articles,
+            'search' => $search,
+            'categories' => $categories,
+            'selectedCategoryId' => $selectedCategoryId,
+            'currentPage' => $currentPage,
+        ]);
     }
 
     /**
@@ -281,12 +324,171 @@ class ArticleController
     public function show(int $id): void
     {
         $article = $this->articleModel->getById($id);
+        $categories = $this->categoryModel->getAll();
 
         if (!$article) {
             Flight::redirect('/actualites?error=notfound');
             return;
         }
 
-        Flight::render('front/article', ['article' => $article]);
+        Flight::render('front/article', [
+            'article' => $article,
+            'categories' => $categories,
+            'articleDetailsHtml' => $this->prepareArticleDetailsHtml((string) ($article['details'] ?? '')),
+            'relatedArticles' => $this->getRelatedArticlesWithImage($id, 3),
+        ]);
+    }
+
+    protected function prepareArticleDetailsHtml(string $html): string
+    {
+        if ($html === '') {
+            return '';
+        }
+
+        $doc = new \DOMDocument();
+        libxml_use_internal_errors(true);
+        $doc->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        libxml_clear_errors();
+
+        /** @var \DOMElement $image */
+        foreach ($doc->getElementsByTagName('img') as $image) {
+            $src = (string) $image->getAttribute('src');
+            if (strpos($src, '../../uploads/') === 0) {
+                $image->setAttribute('src', str_replace('../../uploads/', '/uploads/', $src));
+            }
+        }
+
+        $root = $doc;
+        $nodes = [];
+        foreach ($root->childNodes as $node) {
+            $nodes[] = $node;
+        }
+
+        $sequence = [];
+
+        $flushSequence = function () use (&$sequence, $doc, $root): void {
+            if (count($sequence) === 0) {
+                return;
+            }
+
+            $count = count($sequence);
+            $classes = ['image-sequence', 'image-count-' . $count];
+            if ($count >= 4) {
+                $classes[] = 'image-count-many';
+            }
+
+            $wrapper = $doc->createElement('div');
+            $wrapper->setAttribute('class', implode(' ', $classes));
+            $first = $sequence[0];
+            $root->insertBefore($wrapper, $first);
+
+            foreach ($sequence as $imageNode) {
+                $wrapper->appendChild($imageNode);
+            }
+
+            $sequence = [];
+        };
+
+        foreach ($nodes as $node) {
+            if ($this->isImageOnlyNode($node)) {
+                $sequence[] = $node;
+                continue;
+            }
+
+            $flushSequence();
+        }
+
+        $flushSequence();
+
+        $processed = $doc->saveHTML() ?: $html;
+        $processed = preg_replace('/^<\?xml[^>]+\?>\s*/i', '', $processed) ?? $processed;
+
+        return $processed;
+    }
+
+    protected function isImageOnlyNode(\DOMNode $node): bool
+    {
+        if ($node->nodeType === XML_TEXT_NODE) {
+            return trim((string) $node->textContent) === '';
+        }
+
+        if ($node->nodeType !== XML_ELEMENT_NODE) {
+            return false;
+        }
+
+        /** @var \DOMElement $element */
+        $element = $node;
+        $tagName = strtolower($element->tagName);
+
+        if ($tagName === 'img') {
+            return true;
+        }
+
+        if (!in_array($tagName, ['p', 'div', 'figure', 'span', 'a'], true)) {
+            return false;
+        }
+
+        $hasImage = false;
+        foreach ($element->childNodes as $child) {
+            if ($child->nodeType === XML_TEXT_NODE && trim((string) $child->textContent) === '') {
+                continue;
+            }
+
+            if ($child->nodeType === XML_ELEMENT_NODE) {
+                $childTagName = strtolower((string) $child->nodeName);
+                if ($childTagName === 'br') {
+                    continue;
+                }
+
+                if ($this->isImageOnlyNode($child)) {
+                    $hasImage = true;
+                    continue;
+                }
+            }
+
+            return false;
+        }
+
+        return $hasImage;
+    }
+
+    /**
+     * Retourne des articles differents de l'article courant avec une image extraite.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    protected function getRelatedArticlesWithImage(int $currentId, int $limit = 3): array
+    {
+        $articles = $this->articleModel->getAll();
+        $related = [];
+
+        foreach ($articles as $article) {
+            if ((int) ($article['id'] ?? 0) === $currentId) {
+                continue;
+            }
+
+            $details = (string) ($article['details'] ?? '');
+            if (preg_match('/<img[^>]+src=["\']([^"\']+)["\']/i', $details, $match) !== 1) {
+                continue;
+            }
+
+            $firstImage = trim((string) ($match[1] ?? ''));
+            if ($firstImage === '') {
+                continue;
+            }
+
+            if (strpos($firstImage, '../../uploads/') === 0) {
+                $firstImage = str_replace('../../uploads/', '/uploads/', $firstImage);
+            }
+
+            $article['first_image'] = $firstImage;
+            $related[] = $article;
+
+            if (count($related) >= $limit) {
+                break;
+            }
+        }
+
+        return $related;
     }
 }
