@@ -244,7 +244,7 @@ foreach ($articles as $article) {
             border-radius: 8px;
             padding: 16px;
             background: #fff;
-            cursor: default;
+            cursor: pointer;
             transition: box-shadow 0.2s ease, transform 0.2s ease;
         }
         .article-card:hover {
@@ -449,7 +449,7 @@ foreach ($articles as $article) {
                     <h3 class="side-title">Articles avec image</h3>
                     <div class="articles-with-image">
                         <?php foreach ($articlesWithImage as $article): ?>
-                            <article class="article-card">
+                            <article class="article-card" onclick="window.location.href='article.php?id=<?= (int) $article['id'] ?>'">
                                 <img src="<?= htmlspecialchars((string) $article['first_image'], ENT_QUOTES, 'UTF-8') ?>" alt="Apercu image de l'article" class="article-thumb">
 
                                 <h2 class="article-title"><?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?></h2>
@@ -460,7 +460,7 @@ foreach ($articles as $article) {
                                     <?= htmlspecialchars(mb_substr(strip_tags((string) $article['details']), 0, 160), ENT_QUOTES, 'UTF-8') ?>...
                                 </p>
 
-                                <div class="card-actions">
+                                <div class="card-actions" onclick="event.stopPropagation()">
                                     <a href="#" class="btn btn-warning btn-icon" title="Modifier" aria-label="Modifier">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm18.71-11.04a1.004 1.004 0 0 0 0-1.42l-2.5-2.5a1.004 1.004 0 0 0-1.42 0L15.13 4.95l3.75 3.75 2.83-2.49z"/></svg>
                                         <span class="sr-only">Modifier</span>
@@ -479,7 +479,7 @@ foreach ($articles as $article) {
                     <h3 class="side-title">Articles sans image</h3>
                     <div class="articles-without-image">
                         <?php foreach ($articlesWithoutImage as $article): ?>
-                            <article class="article-card no-image">
+                            <article class="article-card no-image" onclick="window.location.href='article.php?id=<?= (int) $article['id'] ?>'">
                                 <h2 class="article-title"><?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?></h2>
                                 <p class="article-meta"><strong>Date:</strong> <?= htmlspecialchars((string) $article['date'], ENT_QUOTES, 'UTF-8') ?></p>
                                 <p class="article-meta"><strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe'), ENT_QUOTES, 'UTF-8') ?></p>
@@ -488,7 +488,7 @@ foreach ($articles as $article) {
                                     <?= htmlspecialchars(mb_substr(strip_tags((string) $article['details']), 0, 160), ENT_QUOTES, 'UTF-8') ?>...
                                 </p>
 
-                                <div class="card-actions">
+                                <div class="card-actions" onclick="event.stopPropagation()">
                                     <a href="#" class="btn btn-warning btn-icon" title="Modifier" aria-label="Modifier">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm18.71-11.04a1.004 1.004 0 0 0 0-1.42l-2.5-2.5a1.004 1.004 0 0 0-1.42 0L15.13 4.95l3.75 3.75 2.83-2.49z"/></svg>
                                         <span class="sr-only">Modifier</span>
