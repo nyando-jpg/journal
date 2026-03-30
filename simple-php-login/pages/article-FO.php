@@ -6,7 +6,7 @@ require __DIR__ . '/../config/db.php';
 
 $articleId = max(0, (int) ($_GET['id'] ?? 0));
 if ($articleId <= 0) {
-    header('Location: /Iran/actualites.html?error=notfound');
+    header('Location: actualites-FO.php?error=notfound');
     exit;
 }
 
@@ -22,26 +22,23 @@ function normalize_front_image_src_detail(string $src): string
         return '';
     }
 
-    // Already a correct absolute path
-    if (strpos($src, '/uploads/') === 0) {
+    if (strpos($src, '/simple-php-login/uploads/') === 0) {
         return $src;
     }
-    // Legacy path with /simple-php-login/ prefix - remove it
-    if (strpos($src, '/simple-php-login/uploads/') === 0) {
-        return str_replace('/simple-php-login/uploads/', '/uploads/', $src);
-    }
-    // Relative paths - convert to absolute /uploads/
     if (strpos($src, '../../uploads/') === 0) {
-        return str_replace('../../uploads/', '/uploads/', $src);
+        return str_replace('../../uploads/', '/simple-php-login/uploads/', $src);
     }
     if (strpos($src, '../uploads/') === 0) {
-        return str_replace('../uploads/', '/uploads/', $src);
+        return str_replace('../uploads/', '/simple-php-login/uploads/', $src);
     }
     if (strpos($src, './uploads/') === 0) {
-        return str_replace('./uploads/', '/uploads/', $src);
+        return str_replace('./uploads/', '/simple-php-login/uploads/', $src);
+    }
+    if (strpos($src, '/uploads/') === 0) {
+        return str_replace('/uploads/', '/simple-php-login/uploads/', $src);
     }
     if (strpos($src, 'uploads/') === 0) {
-        return '/' . $src;
+        return '/simple-php-login/' . $src;
     }
 
     return $src;
@@ -72,7 +69,7 @@ try {
     $article = $stmt->fetch();
 
     if (!$article) {
-        header('Location: /Iran/actualites.html?error=notfound');
+        header('Location: actualites-FO.php?error=notfound');
         exit;
     }
 
@@ -85,7 +82,7 @@ try {
     foreach ($relatedRows as $row) {
         $img = extract_first_image_from_details_front((string) ($row['details'] ?? ''));
         if ($img === '') {
-            $img = '/uploads/image.png';
+            $img = '/simple-php-login/uploads/image.png';
         }
         $row['first_image'] = $img;
         $relatedArticles[] = $row;
@@ -129,7 +126,6 @@ if (is_array($article)) {
         .category-link:hover { color: #60a5fa; }
         main { width: 90%; max-width: 1200px; margin: 20px auto; padding: 0; }
         .article-container { background: white; border-radius: 8px; padding: 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .article-title { font-size: 2rem; color: #1f2937; margin-bottom: 20px; font-family: "Playfair Display", "Times New Roman", serif; line-height: 1.3; }
         .article-meta { color: #666; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
         .article-content { font-size: 1.1rem; }
         .article-content p:first-of-type::first-letter { float: left; font-family: "Playfair Display", "Times New Roman", serif; font-size: 4.4em; line-height: 0.82; margin: 0.03em 0.14em 0 0; font-weight: 700; color: #0f172a; text-transform: uppercase; }
@@ -143,16 +139,7 @@ if (is_array($article)) {
         .related-date { margin: 0 0 6px 0; font-size: 0.85rem; color: #6b7280; }
         .related-name { margin: 0; font-size: 0.95rem; color: #111827; }
         .back-link { display: inline-block; margin-top: 30px; padding: 12px 25px; background-color: #e94560; color: white; text-decoration: none; border-radius: 5px; }
-        .site-footer { background-color: #0f172a; color: #f8fafc; border-top: 1px solid rgba(148, 163, 184, 0.35); }
-        .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 24px; padding: 38px 20px 0; }
-        .footer-title { margin: 0 0 10px 0; font-size: 1rem; color: #ffffff; letter-spacing: 0.04em; text-transform: uppercase; }
-        .footer-text { margin: 0 0 8px 0; color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; }
-        .footer-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
-        .footer-list a { color: #cbd5e1; text-decoration: none; font-size: 0.95rem; }
-        .footer-list a:hover { color: #60a5fa; }
-        .footer-bottom { max-width: 1200px; margin: 18px auto 0; padding: 16px 20px; border-top: 1px solid rgba(148, 163, 184, 0.35); color: #94a3b8; font-size: 0.9rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-        @media (max-width: 900px) { .article-container { padding: 25px; } .related-grid { grid-template-columns: 1fr; } .footer-inner { grid-template-columns: 1fr 1fr; } .footer-bottom { flex-direction: column; } }
-        @media (max-width: 600px) { .footer-inner { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) { .article-container { padding: 25px; } .related-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -165,12 +152,12 @@ if (is_array($article)) {
         </div>
         <div class="header-main-inner">
             <div>
-                <a href="/Iran/actualites.html" class="brand-link">Journal d'Information</a>
+                <a href="actualites-FO.php" class="brand-link">Journal d'Information</a>
                 <p class="brand-tagline">Analyses, terrain et decryptage geopolitique</p>
             </div>
             <div class="header-categories">
                 <?php foreach ($categories as $headerCategory): ?>
-                    <a href="/Iran/actualites.html?category=<?= (int) $headerCategory['id_categorie'] ?>" class="category-link">
+                    <a href="actualites-FO.php?category=<?= (int) $headerCategory['id_categorie'] ?>" class="category-link">
                         <?= htmlspecialchars((string) $headerCategory['nom_categorie'], ENT_QUOTES, 'UTF-8') ?>
                     </a>
                 <?php endforeach; ?>
@@ -185,7 +172,6 @@ if (is_array($article)) {
 
         <?php if ($article): ?>
             <article class="article-container">
-                <h1 class="article-title"><?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?></h1>
                 <div class="article-meta">
                     <p><strong>Date:</strong> <?= htmlspecialchars((string) $article['date'], ENT_QUOTES, 'UTF-8') ?> | <strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe'), ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
@@ -198,8 +184,8 @@ if (is_array($article)) {
                         <h3 class="related-title">Autres articles</h3>
                         <div class="related-grid">
                             <?php foreach ($relatedArticles as $related): ?>
-                                <a href="/Iran/article/<?= (int) $related['id'] ?>.html" class="related-card">
-                                    <img src="<?= htmlspecialchars((string) $related['first_image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string) ($related['titre'] ?? 'Article'), ENT_QUOTES, 'UTF-8') ?>" class="related-thumb">
+                                <a href="article-FO.php?id=<?= (int) $related['id'] ?>" class="related-card">
+                                    <img src="<?= htmlspecialchars((string) $related['first_image'], ENT_QUOTES, 'UTF-8') ?>" alt="Apercu article" class="related-thumb">
                                     <div class="related-body">
                                         <p class="related-date"><?= htmlspecialchars((string) ($related['date'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
                                         <p class="related-name"><?= htmlspecialchars((string) ($related['titre'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
@@ -210,39 +196,9 @@ if (is_array($article)) {
                     </section>
                 <?php endif; ?>
 
-                <a href="/Iran/actualites.html" class="back-link">Retour aux actualites</a>
+                <a href="actualites-FO.php" class="back-link">Retour aux actualites</a>
             </article>
         <?php endif; ?>
     </main>
-
-    <footer class="site-footer">
-        <div class="footer-inner">
-            <div>
-                <h3 class="footer-title">Journal d'Information</h3>
-                <p class="footer-text">Analyses approfondies et couverture complete de l'actualite geopolitique. Decryptage des enjeux majeurs et perspectives strategiques.</p>
-            </div>
-            <div>
-                <h3 class="footer-title">Categories</h3>
-                <ul class="footer-list">
-                    <?php foreach (array_slice($categories, 0, 5) as $cat): ?>
-                        <li><a href="/Iran/actualites.html?category=<?= (int) $cat['id_categorie'] ?>"><?= htmlspecialchars((string) $cat['nom_categorie'], ENT_QUOTES, 'UTF-8') ?></a></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-            <div>
-                <h3 class="footer-title">Contact</h3>
-                <p class="footer-text"><strong>Email :</strong> redaction@journalinfo.fr</p>
-                <p class="footer-text"><strong>Tel :</strong> +33 (0)1 XX XX XX XX</p>
-                <p class="footer-text"><strong>Adresse :</strong> Paris, France</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <span>&copy; <?= date('Y') ?> Journal d'Information. Tous droits reserves.</span>
-            <div>
-                <a href="#" style="color: #cbd5e1; text-decoration: none; margin-left: 15px;">Mentions legales</a>
-                <a href="#" style="color: #cbd5e1; text-decoration: none; margin-left: 15px;">Politique de confidentialite</a>
-            </div>
-        </div>
-    </footer>
 </body>
 </html>

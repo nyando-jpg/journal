@@ -5,7 +5,7 @@ declare(strict_types=1);
 session_start();
 
 if (isset($_SESSION['user_id'], $_SESSION['user_name'], $_SESSION['is_admin'])) {
-    header('Location: /admin');
+    header('Location: index.php');
     exit;
 }
 
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user_name'] = (string) $user['nom'];
                 $_SESSION['is_admin'] = (int) $user['is_admin'] === 1;
 
-                header('Location: /admin');
+                header('Location: index.php');
                 exit;
             }
 
@@ -177,29 +177,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 0.82rem;
             color: #94a3b8;
         }
-        .frontoffice-link {
-            margin-top: 24px;
-            text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
-        }
-        .frontoffice-link a {
-            display: inline-block;
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 600;
-            padding: 12px 24px;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-            transition: all 0.3s ease;
-        }
-        .frontoffice-link a:hover {
-            background: linear-gradient(135deg, #059669, #047857);
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.45);
-            transform: translateY(-2px);
-        }
 
         footer {
             background: #121629;
@@ -219,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <span>Contact redaction : redaction@journalinfo.fr</span>
         </div>
         <div class="header-main">
-            <a href="/admin/login" class="brand-name">Journal d'Information</a>
+            <a href="login.php" class="brand-name">Journal d'Information</a>
             <p class="brand-tagline">Analyses, terrain et decryptage geopolitique</p>
         </div>
     </header>
@@ -236,7 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             <?php endif; ?>
 
-            <form action="/admin/login" method="POST">
+            <form action="login.php" method="POST">
                 <div class="form-group">
                     <label class="form-label" for="name">Nom d'utilisateur</label>
                     <input type="text" name="name" id="name" class="form-input"
@@ -255,10 +232,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
 
             <p class="login-footer-note">Acces securise - Journaux d'acces actives</p>
-
-            <div class="frontoffice-link">
-                <a href="/Iran/actualites.html">Acceder au site public &rarr;</a>
-            </div>
         </div>
     </div>
 

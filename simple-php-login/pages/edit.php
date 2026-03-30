@@ -6,7 +6,7 @@ session_start();
 
 if (!isset($_SESSION['user_id'], $_SESSION['user_name'], $_SESSION['is_admin'])) {
     session_unset();
-    header('Location: /admin/login');
+    header('Location: login.php');
     exit;
 }
 
@@ -14,7 +14,7 @@ require __DIR__ . '/../config/db.php';
 
 $articleId = max(0, (int) ($_GET['id'] ?? $_POST['id'] ?? 0));
 if ($articleId <= 0) {
-    header('Location: /admin?error=notfound');
+    header('Location: index.php?error=notfound');
     exit;
 }
 
@@ -55,7 +55,7 @@ try {
     $article = $articleStmt->fetch();
 
     if (!$article) {
-        header('Location: /admin?error=notfound');
+        header('Location: index.php?error=notfound');
         exit;
     }
 
@@ -88,7 +88,7 @@ try {
                 $updateStmt->bindValue(':id', $articleId, PDO::PARAM_INT);
                 $updateStmt->execute();
 
-                header('Location: /admin?success=updated');
+                header('Location: index.php?success=updated');
                 exit;
             }
         }
@@ -300,7 +300,7 @@ try {
     </header>
 
     <main>
-        <a href="/admin" class="back-link">&larr; Retour a la liste</a>
+        <a href="index.php?q=&category=0" class="back-link">&larr; Retour a la liste</a>
 
         <span class="title-badge">Espace edition</span>
         <h1 class="page-title">Modifier l'article #<?= (int) $articleId ?></h1>
@@ -320,7 +320,7 @@ try {
         <?php endif; ?>
 
         <div class="form-card">
-            <form action="/admin/edit/<?= (int) $articleId ?>" method="POST">
+            <form action="edit.php" method="POST">
                 <input type="hidden" name="id" value="<?= (int) $articleId ?>">
 
                 <div class="form-group">
@@ -355,7 +355,7 @@ try {
 
                 <div class="form-actions">
                     <button type="submit" class="btn-primary">Mettre a jour</button>
-                    <a href="/admin" class="btn-secondary">Annuler</a>
+                    <a href="index.php?q=&category=0" class="btn-secondary">Annuler</a>
                 </div>
             </form>
         </div>

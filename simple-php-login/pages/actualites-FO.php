@@ -19,26 +19,23 @@ function normalize_front_image_src(string $src): string
         return '';
     }
 
-    // Already a correct absolute path
-    if (strpos($src, '/uploads/') === 0) {
+    if (strpos($src, '/simple-php-login/uploads/') === 0) {
         return $src;
     }
-    // Legacy path with /simple-php-login/ prefix - remove it
-    if (strpos($src, '/simple-php-login/uploads/') === 0) {
-        return str_replace('/simple-php-login/uploads/', '/uploads/', $src);
-    }
-    // Relative paths - convert to absolute /uploads/
     if (strpos($src, '../../uploads/') === 0) {
-        return str_replace('../../uploads/', '/uploads/', $src);
+        return str_replace('../../uploads/', '/simple-php-login/uploads/', $src);
     }
     if (strpos($src, '../uploads/') === 0) {
-        return str_replace('../uploads/', '/uploads/', $src);
+        return str_replace('../uploads/', '/simple-php-login/uploads/', $src);
     }
     if (strpos($src, './uploads/') === 0) {
-        return str_replace('./uploads/', '/uploads/', $src);
+        return str_replace('./uploads/', '/simple-php-login/uploads/', $src);
+    }
+    if (strpos($src, '/uploads/') === 0) {
+        return str_replace('/uploads/', '/simple-php-login/uploads/', $src);
     }
     if (strpos($src, 'uploads/') === 0) {
-        return '/' . $src;
+        return '/simple-php-login/' . $src;
     }
 
     return $src;
@@ -117,7 +114,7 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Actualites sur la Guerre en Iran - Journal d'Information</title>
     <meta name="description" content="Suivez les dernieres actualites et analyses sur la situation en Iran.">
-    <link rel="canonical" href="http://localhost:8000/simple-php-login/Iran/actualites.html">
+    <link rel="canonical" href="http://localhost:8000/simple-php-login/pages/actualites-FO.php">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: "Merriweather", Georgia, serif; line-height: 1.8; color: #333; background-color: #f5f5f5; }
@@ -131,7 +128,6 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
         .category-link { display: inline-block; color: #ffffff; text-decoration: none; font-size: 0.9rem; font-weight: 500; }
         .category-link:hover, .category-link.active { color: #60a5fa; }
         main { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
-        main h1 { font-size: 1.8rem; color: #1f2937; margin-bottom: 20px; font-family: "Playfair Display", "Times New Roman", serif; }
         .search-bar { display: flex; gap: 10px; margin: 10px 0 20px 0; align-items: center; flex-wrap: wrap; }
         .search-input { flex: 1; min-width: 260px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
         .btn { display: inline-block; padding: 8px 16px; margin: 2px; text-decoration: none; border-radius: 4px; cursor: pointer; border: none; }
@@ -177,12 +173,12 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
         </div>
         <div class="header-main-inner">
             <div>
-                <a href="/Iran/actualites.html" class="brand-link">Journal d'Information</a>
+                <a href="actualites-FO.php" class="brand-link">Journal d'Information</a>
                 <p class="brand-tagline">Analyses, terrain et decryptage geopolitique</p>
             </div>
             <div class="header-categories">
                 <?php foreach ($categories as $headerCategory): ?>
-                    <a href="/Iran/actualites.html?category=<?= (int) $headerCategory['id_categorie'] ?>" class="category-link <?= $selectedCategoryId === (int) $headerCategory['id_categorie'] ? 'active' : '' ?>">
+                    <a href="actualites-FO.php?category=<?= (int) $headerCategory['id_categorie'] ?>" class="category-link <?= $selectedCategoryId === (int) $headerCategory['id_categorie'] ? 'active' : '' ?>">
                         <?= htmlspecialchars((string) $headerCategory['nom_categorie'], ENT_QUOTES, 'UTF-8') ?>
                     </a>
                 <?php endforeach; ?>
@@ -191,13 +187,12 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
     </header>
 
     <main>
-        <h1>Actualites sur la Guerre en Iran</h1>
         <section aria-label="Liste des articles">
             <?php if ($dbError !== ''): ?>
                 <div class="empty-state"><p><?= htmlspecialchars($dbError, ENT_QUOTES, 'UTF-8') ?></p></div>
             <?php endif; ?>
 
-            <form action="/Iran/actualites.html" method="GET" class="search-bar">
+            <form action="actualites-FO.php" method="GET" class="search-bar">
                 <input type="text" name="q" class="search-input" placeholder="Rechercher par titre, contenu, auteur, date ou ID" value="<?= htmlspecialchars($search, ENT_QUOTES, 'UTF-8') ?>">
                 <select name="category" class="search-input" style="max-width: 260px;">
                     <option value="0">Toutes les categories</option>
@@ -209,7 +204,7 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
                 </select>
                 <button type="submit" class="btn btn-primary">Rechercher</button>
                 <?php if ($search !== '' || $selectedCategoryId > 0): ?>
-                    <a href="/Iran/actualites.html" class="btn">Effacer</a>
+                    <a href="actualites-FO.php" class="btn">Effacer</a>
                 <?php endif; ?>
             </form>
 
@@ -227,14 +222,14 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
                         <h3 class="side-title">Articles avec image</h3>
                         <div class="articles-with-image">
                             <?php foreach ($pagedArticlesWithImage as $article): ?>
-                                <article class="article-card" onclick="window.location.href='/Iran/article/<?= (int) $article['id'] ?>.html'">
-                                    <img src="<?= htmlspecialchars((string) $article['first_image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?>" class="article-thumb">
+                                <article class="article-card" onclick="window.location.href='article-FO.php?id=<?= (int) $article['id'] ?>'">
+                                    <img src="<?= htmlspecialchars((string) $article['first_image'], ENT_QUOTES, 'UTF-8') ?>" alt="Apercu image de l'article" class="article-thumb">
                                     <h2 class="article-title"><?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?></h2>
                                     <p class="article-meta"><strong>Date:</strong> <?= htmlspecialchars((string) $article['date'], ENT_QUOTES, 'UTF-8') ?></p>
                                     <p class="article-meta"><strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe'), ENT_QUOTES, 'UTF-8') ?></p>
                                     <p class="article-meta"><strong>Auteur:</strong> <?= htmlspecialchars((string) ($article['admin_nom'] ?? ('Admin #' . $article['id_admin'])), ENT_QUOTES, 'UTF-8') ?></p>
                                     <p class="content-preview"><?= htmlspecialchars(mb_substr(strip_tags((string) $article['details']), 0, 160), ENT_QUOTES, 'UTF-8') ?>...</p>
-                                    <a href="/Iran/article/<?= (int) $article['id'] ?>.html" class="card-read" onclick="event.stopPropagation()">Lire la suite</a>
+                                    <a href="article-FO.php?id=<?= (int) $article['id'] ?>" class="card-read" onclick="event.stopPropagation()">Lire la suite</a>
                                 </article>
                             <?php endforeach; ?>
                         </div>
@@ -255,7 +250,7 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
                                 $prevParams = ['page' => $prevPage];
                                 if ($search !== '') { $prevParams['q'] = $search; }
                                 if ($selectedCategoryId > 0) { $prevParams['category'] = $selectedCategoryId; }
-                                $prevUrl = '/Iran/actualites.html?' . http_build_query($prevParams);
+                                $prevUrl = 'actualites-FO.php?' . http_build_query($prevParams);
                                 ?>
                                 <a href="<?= htmlspecialchars($prevUrl, ENT_QUOTES, 'UTF-8') ?>" class="pagination-link<?= $activePage === 1 ? ' disabled' : '' ?>">&lsaquo;</a>
 
@@ -268,7 +263,7 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
                                     $queryParams = ['page' => $pageNumber];
                                     if ($search !== '') { $queryParams['q'] = $search; }
                                     if ($selectedCategoryId > 0) { $queryParams['category'] = $selectedCategoryId; }
-                                    $pageUrl = '/Iran/actualites.html?' . http_build_query($queryParams);
+                                    $pageUrl = 'actualites-FO.php?' . http_build_query($queryParams);
                                     ?>
                                     <a href="<?= htmlspecialchars($pageUrl, ENT_QUOTES, 'UTF-8') ?>" class="pagination-link<?= $pageNumber === $activePage ? ' active' : '' ?>" <?= $pageNumber === $activePage ? 'aria-current="page"' : '' ?>><?= $pageNumber ?></a>
                                     <?php $previousPrinted = $pageNumber; ?>
@@ -278,7 +273,7 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
                                 $nextParams = ['page' => $nextPage];
                                 if ($search !== '') { $nextParams['q'] = $search; }
                                 if ($selectedCategoryId > 0) { $nextParams['category'] = $selectedCategoryId; }
-                                $nextUrl = '/Iran/actualites.html?' . http_build_query($nextParams);
+                                $nextUrl = 'actualites-FO.php?' . http_build_query($nextParams);
                                 ?>
                                 <a href="<?= htmlspecialchars($nextUrl, ENT_QUOTES, 'UTF-8') ?>" class="pagination-link<?= $activePage === $totalPages ? ' disabled' : '' ?>">&rsaquo;</a>
                             </nav>
@@ -289,13 +284,13 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
                         <h3 class="side-title">Articles sans image</h3>
                         <div class="articles-without-image">
                             <?php foreach ($pagedArticlesWithoutImage as $article): ?>
-                                <article class="article-card no-image" onclick="window.location.href='/Iran/article/<?= (int) $article['id'] ?>.html'">
+                                <article class="article-card no-image" onclick="window.location.href='article-FO.php?id=<?= (int) $article['id'] ?>'">
                                     <h2 class="article-title"><?= htmlspecialchars((string) $article['titre'], ENT_QUOTES, 'UTF-8') ?></h2>
                                     <p class="article-meta"><strong>Date:</strong> <?= htmlspecialchars((string) $article['date'], ENT_QUOTES, 'UTF-8') ?></p>
                                     <p class="article-meta"><strong>Categorie:</strong> <?= htmlspecialchars((string) ($article['nom_categorie'] ?? 'Non classe'), ENT_QUOTES, 'UTF-8') ?></p>
                                     <p class="article-meta"><strong>Auteur:</strong> <?= htmlspecialchars((string) ($article['admin_nom'] ?? ('Admin #' . $article['id_admin'])), ENT_QUOTES, 'UTF-8') ?></p>
                                     <p class="content-preview"><?= htmlspecialchars(mb_substr(strip_tags((string) $article['details']), 0, 160), ENT_QUOTES, 'UTF-8') ?>...</p>
-                                    <a href="/Iran/article/<?= (int) $article['id'] ?>.html" class="card-read" onclick="event.stopPropagation()">Lire la suite</a>
+                                    <a href="article-FO.php?id=<?= (int) $article['id'] ?>" class="card-read" onclick="event.stopPropagation()">Lire la suite</a>
                                 </article>
                             <?php endforeach; ?>
                         </div>
@@ -304,35 +299,5 @@ $pagedArticlesWithoutImage = array_slice($articlesWithoutImage, $noImageOffset, 
             <?php endif; ?>
         </section>
     </main>
-
-    <footer class="site-header">
-        <div class="footer-inner">
-            <div>
-                <h3 class="footer-title">Journal d'Information</h3>
-                <p class="footer-text">Analyses approfondies et couverture complete de l'actualite geopolitique. Decryptage des enjeux majeurs et perspectives strategiques.</p>
-            </div>
-            <div>
-                <h3 class="footer-title">Categories</h3>
-                <ul class="footer-list">
-                    <?php foreach (array_slice($categories, 0, 5) as $cat): ?>
-                        <li><a href="/Iran/actualites.html?category=<?= (int) $cat['id_categorie'] ?>"><?= htmlspecialchars((string) $cat['nom_categorie'], ENT_QUOTES, 'UTF-8') ?></a></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-            <div>
-                <h3 class="footer-title">Contact</h3>
-                <p class="footer-text"><strong>Email :</strong> redaction@journalinfo.fr</p>
-                <p class="footer-text"><strong>Tel :</strong> +33 (0)1 XX XX XX XX</p>
-                <p class="footer-text"><strong>Adresse :</strong> Paris, France</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <span>&copy; <?= date('Y') ?> Journal d'Information. Tous droits reserves.</span>
-            <div>
-                <a href="#" style="color: #cbd5e1; text-decoration: none; margin-left: 15px;">Mentions legales</a>
-                <a href="#" style="color: #cbd5e1; text-decoration: none; margin-left: 15px;">Politique de confidentialite</a>
-            </div>
-        </div>
-    </footer>
 </body>
 </html>

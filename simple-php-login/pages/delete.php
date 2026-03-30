@@ -6,7 +6,7 @@ session_start();
 
 if (!isset($_SESSION['user_id'], $_SESSION['user_name'], $_SESSION['is_admin'])) {
     session_unset();
-    header('Location: /admin/login');
+    header('Location: login.php');
     exit;
 }
 
@@ -14,7 +14,7 @@ require __DIR__ . '/../config/db.php';
 
 $articleId = max(0, (int) ($_GET['id'] ?? 0));
 if ($articleId <= 0) {
-    header('Location: /admin?error=notfound');
+    header('Location: index.php?error=notfound');
     exit;
 }
 
@@ -26,13 +26,13 @@ try {
     $deleteStmt->execute();
 
     if ($deleteStmt->rowCount() === 0) {
-        header('Location: /admin?error=notfound');
+        header('Location: index.php?error=notfound');
         exit;
     }
 
-    header('Location: /admin?success=deleted');
+    header('Location: index.php?success=deleted');
     exit;
 } catch (Throwable $e) {
-    header('Location: /admin?error=notfound');
+    header('Location: index.php?error=notfound');
     exit;
 }
