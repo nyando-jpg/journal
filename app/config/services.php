@@ -6,6 +6,7 @@ use flight\database\PdoWrapper;
 use Tracy\Debugger;
 use app\models\UserModel;
 use app\models\ArticleModel;
+use app\models\CategoryModel;
 
 /** 
  * @var array $config This comes from the returned array at the bottom of the config.php file
@@ -30,4 +31,9 @@ Flight::map('UserModel', function () {
 // Register ArticleModel with Flight
 Flight::map('ArticleModel', function () {
     return new ArticleModel(Flight::db());
+});
+
+// Register CategoryModel with Flight
+Flight::map('CategoryModel', function () {
+    return new CategoryModel(Flight::db());
 });

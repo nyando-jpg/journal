@@ -9,14 +9,30 @@ CREATE TABLE journal_user (
     mail VARCHAR(100) NOT NULL UNIQUE,
     is_admin BOOLEAN NOT NULL DEFAULT FALSE
 );
+
+CREATE TABLE journal_categories (
+    id_categorie INT AUTO_INCREMENT PRIMARY KEY,
+    nom_categorie VARCHAR(100) NOT NULL UNIQUE
+);
+
 CREATE TABLE journal_info (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_admin INT NOT NULL,
+    id_categorie INT NOT NULL DEFAULT 1,
     titre VARCHAR(255) NOT NULL,
     date DATETIME NOT NULL,
     details TEXT NOT NULL,
-    CONSTRAINT fk_journal_info_admin FOREIGN KEY (id_admin) REFERENCES journal_user(id_user)
+    CONSTRAINT fk_journal_info_admin FOREIGN KEY (id_admin) REFERENCES journal_user(id_user),
+    CONSTRAINT fk_journal_info_categorie FOREIGN KEY (id_categorie) REFERENCES journal_categories(id_categorie)
 );
+
+INSERT INTO journal_categories (nom_categorie)
+VALUES
+    ('Geopolitique'),
+    ('Front'),
+    ('Humanitaire'),
+    ('Infrastructure');
+
 
 INSERT INTO journal_user ( nom, mdp, mail,is_admin)
 VALUES
@@ -41,6 +57,14 @@ VALUES
     ('2026-03-26 09:35:00', 1, 'Rapport Matinal: accalmie relative sur la rive interieure', '<h1>Rapport Matinal: accalmie relative sur la rive interieure</h1><p>Une accalmie relative a ete constatee durant les premieres heures du matin sur la rive interieure. Les tirs ont diminue, permettant aux equipes techniques de reparer des conduites d eau et de retablir partiellement l electricite dans deux quartiers densément peuplés. Les habitants sortent prudemment, regardant les facades marquees par les eclats comme on lit une carte du danger. Personne ne parle de normalite, mais chacun saisit la moindre heure calme pour restaurer un peu de quotidien.</p><h2>Infrastructure critique</h2><p>Les reseaux restent vulnerables. Une seule coupure sur une station de pompage peut priver des milliers de personnes d eau en quelques heures. Les techniciens travaillent avec du materiel de fortune, soutenus par des volontaires qui transportent outils et batteries a travers des rues encore partiellement bloquees.</p><h3>Organisation locale</h3><p>Des comites de quartier ont mis en place des tableaux de suivi: besoins medicaux, personnes isolees, disponibilite des vehicules. Cette micro-organisation, discrète mais efficace, permet de reagir vite quand les communications officielles sont saturées.</p><h3>Education interrompue</h3><p>Les ecoles ne fonctionnent plus normalement. Certains enseignants improvisent des sessions courtes dans des sous-sols, entre deux alertes. Pour les enfants, ces moments deviennent un repere indispensable, une maniere de maintenir un fil avec la vie d avant.</p><h2>Suite attendue</h2><p>Les autorites previennent que cette accalmie peut etre temporaire. Elles encouragent a poursuivre la preparation des kits d urgence et a conserver des reserves minimales de nourriture, d eau et de medicaments pour les prochains jours.</p>'),
     ('2026-03-26 19:10:00', 1, 'Edition du Soir: tensions renouvelees autour des hauteurs sud', '<h1>Edition du Soir: tensions renouvelees autour des hauteurs sud</h1><p>En fin de journee, les hauteurs sud ont de nouveau concentre les tirs les plus intenses. Les observateurs parlent d une sequence classique de la guerre d usure: phase de repérage, salves breves, puis silence trompeur avant reprise sporadique. Les habitants des zones voisines ont reçu l ordre de se confiner, tandis que les equipes de liaison confirmaient la tenue des points d appui principaux.</p><h2>Analyse des mouvements</h2><p>Les trajectoires relevees laissent penser a une pression destinee a fixer les defenses plus qu a percer rapidement. Cela n enleve rien au danger: chaque impact sur les voies d acces complique l evacuation des blesses et rallonge les delais de secours.</p><h3>Voix du terrain</h3><p>Un chef de section evoque des hommes fatigues mais lucides, capables de tenir leur poste malgre des nuits fractionnees. Une medecin volontaire raconte des consultations continuees sous alerte, avec des patients qui demandent surtout quand ils pourront dormir sans sursauter.</p><h3>Reseaux d entraide</h3><p>Dans plusieurs quartiers, les habitants mutualisent lampes, radios et rechauds. Les plus jeunes assistent les personnes agees pour les deplacements vers les abris. Ces gestes repetes, simples en apparence, deviennent une forme de resistance civile au quotidien.</p><h2>Cap sur demain</h2><p>Les responsables locaux misent sur la continuité: proteger les infrastructures vitales, maintenir les liaisons de secours et limiter l exposition inutile. Dans ce contexte, chaque decision est prise avec la meme question en tete: comment traverser la nuit suivante avec le moins de pertes possible.</p>'),
     ('2026-03-27 11:00:00', 1, 'Grand Reportage: survivre entre front mobile et ville epuisee', '<h1>Grand Reportage: survivre entre front mobile et ville epuisee</h1><p>La guerre, ici, ne se resume plus aux cartes et aux lignes tracees en rouge. Elle est dans les files d attente devant les boulangeries ouvertes deux heures, dans les coups de fil coupes au milieu d une phrase, dans les sacs prets pres des portes au cas ou il faudrait partir en urgence. Les habitants apprennent a reconnaitre les sons, a distinguer une alerte lointaine d une menace proche, a compter les secondes entre flash et impact. Les soldats, eux, parlent de continuité: tenir la position, proteger les axes, revenir au point de depart quand la nuit brouille tout.</p><h2>La ville en endurance</h2><p>Les services publics fonctionnent en mode degrade mais tiennent encore: eau rationnee, transports partiels, hopitaux sous tension permanente. Les equipes municipales compensent avec des solutions provisoires, parfois bricolées, souvent ingenieuses. Cette endurance administrative, peu visible, empeche l effondrement du quotidien.</p><h3>Generation du milieu</h3><p>Entre les anciens qui ont connu d autres crises et les plus jeunes exposes pour la premiere fois a la violence, une generation intermediaire porte une grande part de la charge: organiser, informer, calmer, transporter, rassurer. Ce sont eux qui traduisent les consignes en gestes concrets de voisinage.</p><h3>Memoire en train de s ecrire</h3><p>Dans les carnets et les telephones, on documente tout: horaires des coupures, adresses utiles, noms des absents, photos des rues avant et apres. Cette memoire immediate sert a la fois de preuve, de repere et de promesse silencieuse qu un jour, il faudra reconstruire.</p><h2>Conclusion provisoire</h2><p>Au terme de cette semaine, rien n est simple, rien n est stable, mais une logique domine: tenir ensemble. C est peut-etre la forme la plus concrete de victoire quand le front bouge peu et que l horizon reste incertain.</p>');
+
+UPDATE journal_info
+SET id_categorie = CASE
+    WHEN id % 4 = 1 THEN 1
+    WHEN id % 4 = 2 THEN 2
+    WHEN id % 4 = 3 THEN 3
+    ELSE 4
+END;
 
 
 
